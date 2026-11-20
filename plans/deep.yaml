@@ -1,0 +1,20 @@
+# Deep check: report + active probes after proof of ownership. Probes follow in wave 3.
+plan: deep
+version: 1
+limits: { totalMs: 300000, requests: 800, browser: false }
+modules:
+  - collect.page
+  - collect.bundles: { maxBundles: 120, followLazyChunks: true }
+  - collect.sourcemaps: { headOnly: true, maxMaps: 40 }
+  - stack.detect
+  - secrets.frontend
+  - headers.security
+  - cookies.flags
+  - tls.basics
+  - sourcemaps.exposed
+  - supabase.config
+  - firebase.config
+  - ai.client-llm-call
+presentation:
+  showFindings: all
+  fixPrompts: true

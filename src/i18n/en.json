@@ -1,0 +1,132 @@
+{
+  "ui": {
+    "light.red": "Someone needs to fix this before real users arrive.",
+    "light.yellow": "Some things should be fixed before launch.",
+    "light.green": "Nothing found in these checks. What was not checked is listed below.",
+    "light.unknown": "The app could not be fully checked. What is missing is listed below.",
+    "severity.critical": "critical",
+    "severity.high": "high",
+    "severity.medium": "medium",
+    "severity.low": "low",
+    "severity.info": "note",
+    "locked": "More findings in the report: {list}",
+    "notChecked": "Not checked",
+    "reason.ownership": "needs proof of ownership (deep check)",
+    "reason.budget": "time or request limit reached",
+    "reason.condition": "does not apply to this app",
+    "reason.error": "could not be loaded",
+    "reason.unsupported": "not supported yet",
+    "reason.dependency": "prerequisite missing",
+    "always": "Never checked: server-side logic, permissions of signed-in users, anything behind the login.",
+    "disclaimer": "A result without findings only means these checks found nothing. It is not a certificate and not a guarantee.",
+    "cta.report": "Full report with steps to fix and ready-made prompts",
+    "cta.human": "Everything behind the login needs a human: production check from €890"
+  },
+  "findings": {
+    "secrets.server-key": {
+      "title": "Secret {provider} key in the frontend",
+      "explain": "The key is shipped to every browser. Anyone can use {provider} on the app's behalf, run up costs or access data.",
+      "fix": "1. Revoke the key at {provider} now and create a new one. 2. Move calls to {provider} to the server (edge function, API route). 3. Store the new key only as a server-side environment variable."
+    },
+    "secrets.test-key": {
+      "title": "{provider} test key in the frontend",
+      "explain": "A test key does less harm, but it does not belong in the browser either, and it suggests the live key will end up in the same place.",
+      "fix": "Rotate the key and move the calls to the server before switching to live."
+    },
+    "secrets.supabase-service-role": {
+      "title": "Supabase service_role key in the frontend",
+      "explain": "This key bypasses all access rules (Row Level Security). Whoever has it can read, change and delete the whole database.",
+      "fix": "1. Rotate the key in the Supabase dashboard now. 2. Use only the anon or publishable key in the client. 3. Move everything that needs elevated rights into edge functions."
+    },
+    "secrets.google-key": {
+      "title": "Google API key in the frontend",
+      "explain": "Some Google keys are meant for the browser (Maps, Firebase). Without restrictions to the domain and APIs, others can use them at the app's expense.",
+      "fix": "In Google Cloud Console, restrict the key to your domain (HTTP referrer) and to the APIs actually used."
+    },
+    "secrets.private-key": {
+      "title": "Private key in the frontend",
+      "explain": "A private key (PEM) is shipped to the browser. Depending on its purpose, it can be used to forge signatures or use services on the app's behalf.",
+      "fix": "Replace the key pair now, revoke the old key everywhere and store the new one on the server only."
+    },
+    "headers.csp": {
+      "title": "No Content Security Policy",
+      "explain": "Without a CSP the browser cannot block injected code. If there is a cross-site scripting hole, the second line of defence is missing.",
+      "fix": "Set a CSP, first as Content-Security-Policy-Report-Only, then enforced. Allow only the sources actually used."
+    },
+    "headers.hsts": {
+      "title": "HSTS missing",
+      "explain": "Without Strict-Transport-Security an attacker on the same network can downgrade the first connection to plain http.",
+      "fix": "Set Strict-Transport-Security: max-age=31536000; includeSubDomains."
+    },
+    "headers.nosniff": {
+      "title": "X-Content-Type-Options missing",
+      "explain": "Browsers then guess file types themselves, which in some cases makes injected code executable.",
+      "fix": "Set X-Content-Type-Options: nosniff."
+    },
+    "headers.frame": {
+      "title": "No protection against framing",
+      "explain": "The app can be embedded invisibly in other sites (clickjacking). Users then click something other than what they see.",
+      "fix": "Set CSP frame-ancestors 'none' (or 'self'), or X-Frame-Options: DENY."
+    },
+    "headers.referrer": {
+      "title": "No Referrer-Policy",
+      "explain": "Without it, the full address including parameters may be sent to other sites.",
+      "fix": "Set Referrer-Policy: strict-origin-when-cross-origin."
+    },
+    "headers.permissions": {
+      "title": "No Permissions-Policy",
+      "explain": "It declares that camera, microphone or location are not used, not even by embedded content.",
+      "fix": "Set a Permissions-Policy, e.g. camera=(), microphone=(), geolocation=()."
+    },
+    "headers.version": {
+      "title": "Server reveals software and version",
+      "explain": "The value \"{value}\" makes targeted attacks on known flaws of that version easier.",
+      "fix": "Remove X-Powered-By and turn off version details in the Server header."
+    },
+    "cookies.flags": {
+      "title": "Cookie \"{name}\" without {missing}",
+      "explain": "Missing cookie attributes make eavesdropping (Secure), theft by script (HttpOnly) or cross-site requests (SameSite) easier.",
+      "fix": "Set the cookie with Secure; HttpOnly; SameSite=Lax unless the client must read it in JavaScript."
+    },
+    "tls.cert-error": {
+      "title": "Certificate is not accepted",
+      "explain": "Browsers show a warning or refuse to connect ({detail}).",
+      "fix": "Renew the certificate or issue it for the right name, and check automatic renewal."
+    },
+    "tls.http-only": {
+      "title": "App runs without encryption",
+      "explain": "Login data and content travel unencrypted.",
+      "fix": "Set up https and permanently redirect http to https."
+    },
+    "tls.no-redirect": {
+      "title": "http does not redirect to https",
+      "explain": "Over http the server answers with status {status} instead of redirecting to https.",
+      "fix": "Set up a permanent redirect (301) from http to https."
+    },
+    "sourcemaps.exposed": {
+      "title": "Source code readable through source maps",
+      "explain": "{count} source map(s) are public. They reveal the original source code, including comments, internal paths and sometimes keys.",
+      "fix": "Turn off source maps in the production build, or upload them only to error monitoring instead of serving them."
+    },
+    "supabase.config": {
+      "title": "Supabase detected",
+      "explain": "The public anon key in the frontend is expected. What matters are the access rules (Row Level Security) of each table. Without them anyone with this key can read or change data. This is the most common serious flaw in AI-built apps.",
+      "fix": "Enable RLS on every table and review the policies. The deep check tests this after proof of ownership."
+    },
+    "firebase.config": {
+      "title": "Firebase detected",
+      "explain": "The web config in the frontend is expected. What matters are the security rules of Firestore, Realtime Database and Storage.",
+      "fix": "Review the rules: no allow read, write: if true. The deep check tests this after proof of ownership."
+    },
+    "ai.client-llm": {
+      "title": "Browser calls {provider} directly",
+      "explain": "The app talks to {provider} from the browser. Either a key sits in the client, or access is open enough for anyone to run up costs on the app's account.",
+      "fix": "Route calls through your own server function that checks the login and limits requests per user."
+    },
+    "ai.browser-flag": {
+      "title": "LLM SDK explicitly enabled in the browser",
+      "explain": "The option dangerouslyAllowBrowser is set. Vendors block browser use by default because it exposes the key.",
+      "fix": "Remove the option and move the SDK call to the server."
+    }
+  }
+}

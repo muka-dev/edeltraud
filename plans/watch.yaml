@@ -1,0 +1,20 @@
+# Watch: weekly passive run, mail only on new findings (diff by fingerprint).
+plan: watch
+version: 1
+limits: { totalMs: 120000, requests: 400, browser: false }
+modules:
+  - collect.page
+  - collect.bundles: { maxBundles: 80, followLazyChunks: true }
+  - collect.sourcemaps: { headOnly: true, maxMaps: 20 }
+  - stack.detect
+  - secrets.frontend
+  - headers.security
+  - cookies.flags
+  - tls.basics
+  - sourcemaps.exposed
+  - supabase.config
+  - firebase.config
+  - ai.client-llm-call
+presentation:
+  showFindings: all
+  fixPrompts: true

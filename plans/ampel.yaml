@@ -1,0 +1,21 @@
+# Free quick check: passive, no browser, under 15 seconds.
+# Runs a few more analyzers than it shows, to count the locked findings.
+plan: ampel
+version: 1
+limits: { totalMs: 15000, requests: 12, browser: false }
+modules:
+  - collect.page
+  - collect.bundles: { maxBundles: 5, followLazyChunks: false }
+  - collect.sourcemaps: { headOnly: true, maxMaps: 2 }
+  - stack.detect
+  - secrets.frontend
+  - headers.security
+  - cookies.flags
+  - tls.basics
+  - sourcemaps.exposed
+  - supabase.config
+  - firebase.config
+  - ai.client-llm-call
+presentation:
+  showFindings: 3
+  fixPrompts: false

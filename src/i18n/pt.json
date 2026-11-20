@@ -1,0 +1,132 @@
+{
+  "ui": {
+    "light.red": "Alguém tem de tratar disto antes de chegarem utilizadores reais.",
+    "light.yellow": "Há pontos que devem ser corrigidos antes do lançamento.",
+    "light.green": "Nada encontrado nestas verificações. O que não foi verificado está indicado abaixo.",
+    "light.unknown": "Não foi possível verificar a app por completo. O que falta está indicado abaixo.",
+    "severity.critical": "crítico",
+    "severity.high": "alto",
+    "severity.medium": "médio",
+    "severity.low": "baixo",
+    "severity.info": "nota",
+    "locked": "Mais pontos no relatório: {list}",
+    "notChecked": "Não verificado",
+    "reason.ownership": "requer prova de titularidade (verificação aprofundada)",
+    "reason.budget": "limite de tempo ou de pedidos atingido",
+    "reason.condition": "não se aplica a esta app",
+    "reason.error": "não foi possível carregar",
+    "reason.unsupported": "ainda não suportado",
+    "reason.dependency": "falta um pré-requisito",
+    "always": "Nunca verificado: lógica no servidor, permissões de utilizadores autenticados, tudo o que está atrás do login.",
+    "disclaimer": "Um resultado sem pontos encontrados significa apenas que estas verificações não encontraram nada. Não é um certificado nem uma garantia.",
+    "cta.report": "Relatório completo com passos de correção e prompts prontos",
+    "cta.human": "Tudo o que está atrás do login precisa de uma pessoa: verificação de produção desde 890 €"
+  },
+  "findings": {
+    "secrets.server-key": {
+      "title": "Chave secreta de {provider} no frontend",
+      "explain": "A chave é entregue a todos os browsers. Qualquer pessoa pode usar {provider} em nome da app, gerar custos ou aceder a dados.",
+      "fix": "1. Revogar já a chave em {provider} e criar uma nova. 2. Passar as chamadas a {provider} para o servidor (edge function, rota de API). 3. Guardar a nova chave apenas como variável de ambiente no servidor."
+    },
+    "secrets.test-key": {
+      "title": "Chave de teste de {provider} no frontend",
+      "explain": "Uma chave de teste causa menos danos, mas também não pertence ao browser e indica que a chave real acabará no mesmo sítio.",
+      "fix": "Renovar a chave e passar as chamadas para o servidor antes de mudar para produção."
+    },
+    "secrets.supabase-service-role": {
+      "title": "Chave service_role do Supabase no frontend",
+      "explain": "Esta chave ignora todas as regras de acesso (Row Level Security). Quem a tiver pode ler, alterar e apagar toda a base de dados.",
+      "fix": "1. Renovar já a chave no painel do Supabase. 2. Usar no cliente apenas a chave anon ou publishable. 3. Passar tudo o que precisa de mais permissões para edge functions."
+    },
+    "secrets.google-key": {
+      "title": "Chave de API Google no frontend",
+      "explain": "Algumas chaves Google destinam-se ao browser (Maps, Firebase). Sem restrição ao domínio e às APIs, terceiros podem usá-las à custa da app.",
+      "fix": "Na Google Cloud Console, restringir a chave ao próprio domínio (HTTP referrer) e às APIs realmente usadas."
+    },
+    "secrets.private-key": {
+      "title": "Chave privada no frontend",
+      "explain": "Uma chave privada (PEM) é entregue ao browser. Consoante o uso, permite falsificar assinaturas ou usar serviços em nome da app.",
+      "fix": "Substituir já o par de chaves, revogar a antiga em todo o lado e guardar a nova apenas no servidor."
+    },
+    "headers.csp": {
+      "title": "Sem Content Security Policy",
+      "explain": "Sem CSP o browser não consegue bloquear código injetado. Se houver uma falha de cross-site scripting, falta a segunda linha de defesa.",
+      "fix": "Definir uma CSP, primeiro como Content-Security-Policy-Report-Only, depois em vigor. Permitir só as fontes realmente usadas."
+    },
+    "headers.hsts": {
+      "title": "Falta HSTS",
+      "explain": "Sem Strict-Transport-Security, um atacante na mesma rede pode desviar a primeira ligação para http não cifrado.",
+      "fix": "Definir Strict-Transport-Security: max-age=31536000; includeSubDomains."
+    },
+    "headers.nosniff": {
+      "title": "Falta X-Content-Type-Options",
+      "explain": "Os browsers adivinham então o tipo de ficheiro, o que em alguns casos torna código injetado executável.",
+      "fix": "Definir X-Content-Type-Options: nosniff."
+    },
+    "headers.frame": {
+      "title": "Sem proteção contra incorporação",
+      "explain": "A app pode ser incorporada de forma invisível noutros sites (clickjacking). Os utilizadores clicam então noutra coisa do que veem.",
+      "fix": "Definir CSP frame-ancestors 'none' (ou 'self'), ou X-Frame-Options: DENY."
+    },
+    "headers.referrer": {
+      "title": "Sem Referrer-Policy",
+      "explain": "Sem ela, o endereço completo com parâmetros pode ser enviado a outros sites.",
+      "fix": "Definir Referrer-Policy: strict-origin-when-cross-origin."
+    },
+    "headers.permissions": {
+      "title": "Sem Permissions-Policy",
+      "explain": "Permite declarar que câmara, microfone ou localização não são usados, nem por conteúdo incorporado.",
+      "fix": "Definir uma Permissions-Policy, p. ex. camera=(), microphone=(), geolocation=()."
+    },
+    "headers.version": {
+      "title": "O servidor revela software e versão",
+      "explain": "O valor \"{value}\" facilita ataques dirigidos a falhas conhecidas dessa versão.",
+      "fix": "Remover X-Powered-By e desligar a versão no cabeçalho Server."
+    },
+    "cookies.flags": {
+      "title": "Cookie \"{name}\" sem {missing}",
+      "explain": "Atributos em falta facilitam a interceção (Secure), o roubo por script (HttpOnly) ou pedidos de outros sites (SameSite).",
+      "fix": "Definir o cookie com Secure; HttpOnly; SameSite=Lax, a não ser que o cliente o tenha de ler em JavaScript."
+    },
+    "tls.cert-error": {
+      "title": "O certificado não é aceite",
+      "explain": "Os browsers mostram um aviso ou recusam a ligação ({detail}).",
+      "fix": "Renovar o certificado ou emiti-lo para o nome correto e verificar a renovação automática."
+    },
+    "tls.http-only": {
+      "title": "A app funciona sem cifragem",
+      "explain": "Dados de login e conteúdos circulam sem cifragem.",
+      "fix": "Configurar https e redirecionar http para https de forma permanente."
+    },
+    "tls.no-redirect": {
+      "title": "http não redireciona para https",
+      "explain": "Em http o servidor responde com o estado {status} em vez de redirecionar para https.",
+      "fix": "Configurar um redirecionamento permanente (301) de http para https."
+    },
+    "sourcemaps.exposed": {
+      "title": "Código-fonte acessível através de source maps",
+      "explain": "{count} source map(s) estão públicos. Revelam o código-fonte original, com comentários, caminhos internos e por vezes chaves.",
+      "fix": "Desligar os source maps no build de produção, ou enviá-los apenas para a monitorização de erros em vez de os servir."
+    },
+    "supabase.config": {
+      "title": "Supabase detetado",
+      "explain": "A chave pública anon no frontend é esperada. O que conta são as regras de acesso (Row Level Security) de cada tabela. Sem elas, qualquer pessoa com esta chave pode ler ou alterar dados. É a falha grave mais comum em apps feitas com IA.",
+      "fix": "Ativar RLS em todas as tabelas e rever as políticas. A verificação aprofundada testa isto após prova de titularidade."
+    },
+    "firebase.config": {
+      "title": "Firebase detetado",
+      "explain": "A configuração web no frontend é esperada. O que conta são as regras de segurança do Firestore, Realtime Database e Storage.",
+      "fix": "Rever as regras: nada de allow read, write: if true. A verificação aprofundada testa isto após prova de titularidade."
+    },
+    "ai.client-llm": {
+      "title": "O browser chama {provider} diretamente",
+      "explain": "A app fala com {provider} a partir do browser. Ou há uma chave no cliente, ou o acesso está tão aberto que qualquer pessoa pode gerar custos na conta da app.",
+      "fix": "Encaminhar as chamadas por uma função própria no servidor que verifique o login e limite os pedidos por utilizador."
+    },
+    "ai.browser-flag": {
+      "title": "SDK de LLM ativado explicitamente no browser",
+      "explain": "A opção dangerouslyAllowBrowser está definida. Os fornecedores bloqueiam o uso no browser por omissão, porque expõe a chave.",
+      "fix": "Remover a opção e passar a chamada do SDK para o servidor."
+    }
+  }
+}

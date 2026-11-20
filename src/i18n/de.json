@@ -1,0 +1,132 @@
+{
+  "ui": {
+    "light.red": "Hier muss jemand ran, bevor echte Nutzer kommen.",
+    "light.yellow": "Einiges sollte vor dem Start behoben werden.",
+    "light.green": "Bei diesen Prüfungen nichts gefunden. Was nicht geprüft wurde, steht darunter.",
+    "light.unknown": "Die App ließ sich nicht vollständig prüfen. Was fehlt, steht darunter.",
+    "severity.critical": "kritisch",
+    "severity.high": "hoch",
+    "severity.medium": "mittel",
+    "severity.low": "niedrig",
+    "severity.info": "Hinweis",
+    "locked": "Weitere Befunde im Bericht: {list}",
+    "notChecked": "Nicht geprüft",
+    "reason.ownership": "braucht Nachweis der Inhaberschaft (Tiefenprüfung)",
+    "reason.budget": "Zeit- oder Anfragelimit erreicht",
+    "reason.condition": "trifft auf diese App nicht zu",
+    "reason.error": "Fehler beim Abruf",
+    "reason.unsupported": "noch nicht unterstützt",
+    "reason.dependency": "Voraussetzung fehlt",
+    "always": "Nie geprüft: Logik auf dem Server, Rechte angemeldeter Nutzer, alles hinter der Anmeldung.",
+    "disclaimer": "Ein Ergebnis ohne Befunde heißt nur: Diese Prüfungen haben nichts gefunden. Es ist kein Zertifikat und keine Garantie.",
+    "cta.report": "Vollständiger Bericht mit Schritten zur Behebung und fertigen Prompts",
+    "cta.human": "Für alles hinter der Anmeldung braucht es einen Menschen: Produktionscheck ab 890 €"
+  },
+  "findings": {
+    "secrets.server-key": {
+      "title": "Geheimer {provider}-Schlüssel im Frontend",
+      "explain": "Der Schlüssel wird an jeden Browser ausgeliefert. Damit kann jede Person im Namen der App {provider} nutzen, Kosten verursachen oder auf Daten zugreifen.",
+      "fix": "1. Schlüssel bei {provider} sofort sperren und neu erzeugen. 2. Aufrufe an {provider} auf den Server verlagern (Edge Function, API-Route). 3. Neuen Schlüssel nur als Umgebungsvariable auf dem Server hinterlegen."
+    },
+    "secrets.test-key": {
+      "title": "{provider}-Testschlüssel im Frontend",
+      "explain": "Ein Testschlüssel richtet weniger Schaden an, gehört aber ebenso wenig in den Browser und deutet darauf hin, dass der Live-Schlüssel später an derselben Stelle landet.",
+      "fix": "Schlüssel neu erzeugen und Aufrufe auf den Server verlagern, bevor auf Live umgestellt wird."
+    },
+    "secrets.supabase-service-role": {
+      "title": "Supabase service_role-Schlüssel im Frontend",
+      "explain": "Dieser Schlüssel umgeht alle Zugriffsregeln (Row Level Security). Wer ihn hat, kann die gesamte Datenbank lesen, ändern und löschen.",
+      "fix": "1. Schlüssel im Supabase-Dashboard sofort rotieren. 2. Im Client ausschließlich den anon- bzw. publishable-Key verwenden. 3. Alles, was erweiterte Rechte braucht, in Edge Functions verlagern."
+    },
+    "secrets.google-key": {
+      "title": "Google-API-Schlüssel im Frontend",
+      "explain": "Manche Google-Schlüssel sind für den Browser gedacht (Maps, Firebase). Ohne Beschränkung auf Domain und APIs lassen sie sich aber für fremde Zwecke auf Kosten der App nutzen.",
+      "fix": "In der Google Cloud Console den Schlüssel auf die eigene Domain (HTTP-Referrer) und die tatsächlich benötigten APIs beschränken."
+    },
+    "secrets.private-key": {
+      "title": "Privater Schlüssel im Frontend",
+      "explain": "Ein privater Schlüssel (PEM) wird an den Browser ausgeliefert. Damit lassen sich je nach Zweck Signaturen fälschen oder Dienste im Namen der App nutzen.",
+      "fix": "Schlüsselpaar sofort ersetzen, den alten Schlüssel überall widerrufen und den neuen nur auf dem Server speichern."
+    },
+    "headers.csp": {
+      "title": "Keine Content Security Policy",
+      "explain": "Ohne CSP kann der Browser eingeschleusten Code nicht abwehren. Bei einer Lücke für Cross-Site-Scripting fehlt damit die zweite Verteidigungslinie.",
+      "fix": "Eine CSP setzen, zunächst als Content-Security-Policy-Report-Only, dann scharf. Erlaubt werden nur die tatsächlich genutzten Quellen."
+    },
+    "headers.hsts": {
+      "title": "HSTS fehlt",
+      "explain": "Ohne Strict-Transport-Security kann ein Angreifer im selben Netz die erste Verbindung auf unverschlüsseltes http umlenken.",
+      "fix": "Header Strict-Transport-Security: max-age=31536000; includeSubDomains setzen."
+    },
+    "headers.nosniff": {
+      "title": "X-Content-Type-Options fehlt",
+      "explain": "Browser raten dann den Dateityp selbst, was in manchen Fällen eingeschleusten Code ausführbar macht.",
+      "fix": "Header X-Content-Type-Options: nosniff setzen."
+    },
+    "headers.frame": {
+      "title": "Kein Schutz vor Einbettung in fremde Seiten",
+      "explain": "Die App lässt sich unsichtbar in fremde Seiten einbetten (Clickjacking). Nutzer klicken dann auf etwas anderes, als sie sehen.",
+      "fix": "CSP frame-ancestors 'none' (oder 'self') setzen, alternativ X-Frame-Options: DENY."
+    },
+    "headers.referrer": {
+      "title": "Keine Referrer-Policy",
+      "explain": "Ohne Vorgabe kann die vollständige Adresse samt Parametern an fremde Seiten gehen.",
+      "fix": "Referrer-Policy: strict-origin-when-cross-origin setzen."
+    },
+    "headers.permissions": {
+      "title": "Keine Permissions-Policy",
+      "explain": "Damit lässt sich festlegen, dass Kamera, Mikrofon oder Standort nicht genutzt werden, auch nicht von eingebundenen Inhalten.",
+      "fix": "Permissions-Policy setzen, z. B. camera=(), microphone=(), geolocation=()."
+    },
+    "headers.version": {
+      "title": "Server verrät Software und Version",
+      "explain": "Die Angabe \"{value}\" erleichtert gezielte Angriffe auf bekannte Lücken dieser Version.",
+      "fix": "Header X-Powered-By entfernen und Versionsangaben im Server-Header abschalten."
+    },
+    "cookies.flags": {
+      "title": "Cookie \"{name}\" ohne {missing}",
+      "explain": "Fehlende Cookie-Attribute erleichtern das Mitlesen (Secure), den Diebstahl per Skript (HttpOnly) oder Anfragen von fremden Seiten (SameSite).",
+      "fix": "Cookie mit Secure; HttpOnly; SameSite=Lax setzen, sofern der Client es nicht per JavaScript lesen muss."
+    },
+    "tls.cert-error": {
+      "title": "Zertifikat wird nicht akzeptiert",
+      "explain": "Browser zeigen eine Warnung oder brechen ab ({detail}).",
+      "fix": "Zertifikat erneuern bzw. für den richtigen Namen ausstellen lassen, automatische Verlängerung prüfen."
+    },
+    "tls.http-only": {
+      "title": "App läuft ohne Verschlüsselung",
+      "explain": "Anmeldedaten und Inhalte gehen unverschlüsselt durchs Netz.",
+      "fix": "https einrichten und http dauerhaft auf https umleiten."
+    },
+    "tls.no-redirect": {
+      "title": "http leitet nicht auf https um",
+      "explain": "Unter http antwortet der Server mit Status {status} statt mit einer Umleitung auf https.",
+      "fix": "Dauerhafte Umleitung (301) von http auf https einrichten."
+    },
+    "sourcemaps.exposed": {
+      "title": "Quellcode über Source Maps abrufbar",
+      "explain": "{count} Source Map(s) sind öffentlich. Damit ist der ursprüngliche Quellcode lesbar, samt Kommentaren, internen Pfaden und manchmal Schlüsseln.",
+      "fix": "Source Maps im Produktions-Build abschalten oder nur an das Fehler-Monitoring hochladen, nicht ausliefern."
+    },
+    "supabase.config": {
+      "title": "Supabase erkannt",
+      "explain": "Der öffentliche anon-Key im Frontend ist so vorgesehen. Entscheidend sind die Zugriffsregeln (Row Level Security) jeder Tabelle. Fehlen sie, kann jede Person mit diesem Key Daten lesen oder ändern. Das ist der häufigste schwere Fehler bei KI-gebauten Apps.",
+      "fix": "Für jede Tabelle RLS aktivieren und Richtlinien prüfen. Die Tiefenprüfung testet das nach Nachweis der Inhaberschaft."
+    },
+    "firebase.config": {
+      "title": "Firebase erkannt",
+      "explain": "Die Web-Konfiguration im Frontend ist so vorgesehen. Entscheidend sind die Sicherheitsregeln von Firestore, Realtime Database und Storage.",
+      "fix": "Regeln prüfen: kein allow read, write: if true. Die Tiefenprüfung testet das nach Nachweis der Inhaberschaft."
+    },
+    "ai.client-llm": {
+      "title": "Browser ruft {provider} direkt auf",
+      "explain": "Die App spricht {provider} aus dem Browser an. Dafür muss entweder ein Schlüssel im Client stehen, oder der Zugang ist so offen, dass jede Person Kosten auf Rechnung der App erzeugen kann.",
+      "fix": "Aufrufe über eine eigene Server-Funktion leiten, die Anmeldung prüft und Anfragen pro Nutzer begrenzt."
+    },
+    "ai.browser-flag": {
+      "title": "LLM-SDK ausdrücklich im Browser freigeschaltet",
+      "explain": "Die Option dangerouslyAllowBrowser ist gesetzt. Die Hersteller sperren den Browser-Betrieb standardmäßig, weil dabei der Schlüssel offenliegt.",
+      "fix": "Option entfernen und den SDK-Aufruf auf den Server verlagern."
+    }
+  }
+}
