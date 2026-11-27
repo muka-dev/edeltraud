@@ -1,0 +1,64 @@
+# EDEL.TRAUD.AI on the Hetzner server: API + Ampel page for scan.m-ko.de.
+# The TLS proxy already running on the server (Caddy, nginx …) forwards to 127.0.0.1:8787.
+#
+#   cd /opt/edeltraud/ai-check && docker compose -f deploy/compose.yaml up -d --build
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: edeltraud-api
+    restart: unless-stopped
+    env_file: /opt/edeltraud/api.env      # secrets live outside the repository, see deploy/README.md
+    ports:
+      - "127.0.0.1:8787:8787"             # only the local proxy can reach it
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    pids_limit: 256
+    volumes:
+      - /opt/edeltraud/data:/data          # watch subscriptions (unsubscribe links)
+
+  # Weekly watch: runs once and exits. Started by a systemd timer or cron, see deploy/README.md.
+  watch:
+    profiles: [watch]
+    build:
+      context: ..
+      dockerfile: Dockerfile.worker
+    image: edeltraud-worker
+    command: ["watch", "run"]
+    env_file: /opt/edeltraud/api.env
+    volumes:
+      - /opt/edeltraud/data:/data
+    networks: [egress]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+
+  # Paid jobs (report, deep check): runs all the time, takes jobs from /data/jobs.
+  jobs:
+    profiles: [jobs]
+    build:
+      context: ..
+      dockerfile: Dockerfile.worker
+    image: edeltraud-worker
+    command: ["jobs", "run"]
+    restart: unless-stopped
+    env_file: /opt/edeltraud/api.env
+    volumes:
+      - /opt/edeltraud/data:/data
+    networks: [egress]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+
+networks:
+  # Own bridge network for the browser worker; keep internal services off it.
+  egress:
+    driver: bridge

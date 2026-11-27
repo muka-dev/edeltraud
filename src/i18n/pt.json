@@ -20,7 +20,102 @@
     "always": "Nunca verificado: lógica no servidor, permissões de utilizadores autenticados, tudo o que está atrás do login.",
     "disclaimer": "Um resultado sem pontos encontrados significa apenas que estas verificações não encontraram nada. Não é um certificado nem uma garantia.",
     "cta.report": "Relatório completo com passos de correção e prompts prontos",
-    "cta.human": "Tudo o que está atrás do login precisa de uma pessoa: verificação de produção desde 890 €"
+    "cta.human": "Tudo o que está atrás do login precisa de uma pessoa: verificação de produção desde 890 €",
+    "report.title": "Relatório de verificação",
+    "report.skip": "Saltar para o conteúdo",
+    "report.target": "Endereço verificado",
+    "report.date": "Data",
+    "report.plan": "Âmbito",
+    "report.duration": "Duração",
+    "report.seconds": "{n} s",
+    "report.verdict": "Resultado geral",
+    "report.counts": "Pontos encontrados",
+    "report.stack": "Tecnologias detetadas",
+    "report.incomplete": "Nem tudo foi possível verificar. Um resultado sem pontos encontrados diz, por isso, menos.",
+    "report.summary": "Resumo",
+    "report.col.severity": "Gravidade",
+    "report.col.finding": "Ponto",
+    "report.findings": "Pontos em detalhe",
+    "report.none": "Estas verificações não encontraram nada.",
+    "report.location": "Localização",
+    "report.evidence": "Evidência",
+    "report.explain": "O que significa",
+    "report.fix": "Como corrigir",
+    "report.line": "Linha",
+    "report.selector": "Elemento",
+    "report.prompt.title": "Prompt para a ferramenta de IA",
+    "report.prompt.copy": "Copiar prompt",
+    "report.prompt.copied": "Copiado",
+    "report.prompt.hint": "Para colar no Lovable, Cursor, Claude Code ou numa ferramenta semelhante.",
+    "report.locked": "Mais pontos",
+    "report.always": "Limites desta verificação",
+    "report.disclaimer": "Aviso importante",
+    "report.footer": "EDEL.TRAUD.AI – um produto de m-ko.de",
+    "confidence.confirmed": "confirmado",
+    "confidence.likely": "provável",
+    "confidence.possible": "possível",
+    "plan.ampel": "Semáforo (gratuito)",
+    "plan.report": "Relatório",
+    "plan.deep": "Verificação aprofundada",
+    "plan.watch": "WatchDog",
+    "watch.subject": "EDEL.TRAUD.AI: {parts} em {host}",
+    "watch.subject.welcome": "EDEL.TRAUD.AI: O WatchDog está ativa para {host}",
+    "watch.part.new.one": "{n} novo ponto encontrado",
+    "watch.part.new.many": "{n} novos pontos encontrados",
+    "watch.part.fixed.one": "{n} ponto corrigido",
+    "watch.part.fixed.many": "{n} pontos corrigidos",
+    "watch.part.changed.one": "{n} ponto com gravidade alterada",
+    "watch.part.changed.many": "{n} pontos com gravidade alterada",
+    "watch.intro": "O WatchDog verificou {host} em {date}.",
+    "watch.intro.welcome": "O WatchDog está configurada para {host}. Primeira execução: {date}.",
+    "watch.light": "Semáforo",
+    "watch.light.red": "Vermelho",
+    "watch.light.yellow": "Amarelo",
+    "watch.light.green": "Verde",
+    "watch.light.unknown": "Desconhecido",
+    "watch.light.none": "não verificado antes",
+    "watch.section.new": "Novos",
+    "watch.section.changed": "Gravidade alterada",
+    "watch.section.fixed": "Corrigidos",
+    "watch.fix": "Como corrigir",
+    "watch.where": "Localização",
+    "watch.severity.from": "de {from} para {to}",
+    "watch.incomplete": "Esta execução não conseguiu verificar tudo; os pontos corrigidos só são indicados na próxima execução completa.",
+    "watch.report": "Ver o relatório completo",
+    "watch.footer": "Esta mensagem chega porque o WatchDog está configurada para {host}.",
+    "watch.unsubscribe": "Cancelar subscrição",
+    "watch.welcome.title": "O WatchDog está ativa",
+    "watch.welcome.counts": "Encontrado na primeira execução: {counts}.",
+    "watch.welcome.none": "Na primeira execução não foi encontrado nada.",
+    "watch.welcome.next": "As próximas mensagens indicam apenas o que mudou desde a última execução.",
+    "jobs.report.subject": "O relatório de {host} está pronto",
+    "jobs.deep.subject": "A verificação aprofundada de {host} está pronta",
+    "jobs.report.title": "O relatório de {host} está pronto",
+    "jobs.deep.title": "A verificação aprofundada de {host} está pronta",
+    "jobs.summary": "Resultado: {headline}",
+    "jobs.counts": "Pontos encontrados: {counts}",
+    "jobs.counts.none": "Pontos encontrados: nenhum nestas verificações",
+    "jobs.attached": "O relatório completo segue em anexo em PDF e em HTML. O ficheiro HTML contém os botões para copiar os prompts de correção.",
+    "jobs.next.title": "Próximos passos",
+    "jobs.next.fix": "Tratar os pontos por gravidade, começando pelos críticos e altos.",
+    "jobs.next.watch": "Depois, o WatchDog continua a verificar semanalmente e comunica apenas o que mudou. Em alternativa, uma nova verificação confirma as correções.",
+    "jobs.human": "O que as verificações automáticas não veem é coberto pela verificação humana de produção: {url}",
+    "jobs.contact": "Dúvidas ou reembolso: post@m-ko.de. Os reembolsos são tratados através da Paddle.",
+    "jobs.ownership.subject": "Comprovar a titularidade de {host}",
+    "jobs.ownership.title": "Antes da verificação aprofundada: comprovativo de titularidade de {host}",
+    "jobs.ownership.why": "A verificação aprofundada lê dados de forma ativa. Isso só é admissível em apps que pertencem a quem encomenda, por isso é necessário um comprovativo breve.",
+    "jobs.ownership.choose": "Basta uma das duas opções.",
+    "jobs.ownership.dns": "Opção 1: registo DNS TXT",
+    "jobs.ownership.dnsHint": "Um registo no domínio principal vale para todos os subdomínios.",
+    "jobs.ownership.file": "Opção 2: ficheiro",
+    "jobs.ownership.fileUrl": "Endereço: {url}",
+    "jobs.ownership.fileContent": "Conteúdo do ficheiro: {content}",
+    "jobs.ownership.link": "Assim que o comprovativo estiver colocado, esta ligação inicia a verificação: {url}",
+    "jobs.ownership.linkLabel": "Iniciar verificação aprofundada",
+    "jobs.ownership.valid": "O comprovativo pode ser colocado até {date} (14 dias).",
+    "jobs.failure.subject": "Sobre a verificação de {host}",
+    "jobs.failure.title": "Não foi possível concluir automaticamente a verificação de {host}",
+    "jobs.failure.body": "Isto acontece ocasionalmente. Markus Kosmal analisa o caso pessoalmente, em regra num dia útil. Não é necessária nenhuma ação."
   },
   "findings": {
     "secrets.server-key": {
@@ -127,6 +222,346 @@
       "title": "SDK de LLM ativado explicitamente no browser",
       "explain": "A opção dangerouslyAllowBrowser está definida. Os fornecedores bloqueiam o uso no browser por omissão, porque expõe a chave.",
       "fix": "Remover a opção e passar a chamada do SDK para o servidor."
+    },
+    "tls.cert-expiring": {
+      "title": "O certificado expira em breve",
+      "explain": "O certificado ainda é válido por {days} dia(s) (até {date}). Depois de expirar, os navegadores mostram um aviso e a aplicação fica de difícil acesso.",
+      "fix": "1. Verificar a renovação automática no alojamento ou no Let's Encrypt. 2. Renovar o certificado e voltar a publicá-lo."
+    },
+    "tls.legacy-protocol": {
+      "title": "Versões TLS antigas aceites",
+      "explain": "O servidor ainda aceita {protocols}. Estas versões estão obsoletas e já não são usadas pelos navegadores atuais.",
+      "fix": "1. Definir TLS 1.2 como versão mínima na configuração do servidor ou do alojamento. 2. Voltar a analisar."
+    },
+    "dns.spf-missing": {
+      "title": "Sem registo SPF para {domain}",
+      "explain": "Sem registo SPF, terceiros podem enviar correio em nome de {domain} (spoofing, phishing). Também o correio da própria aplicação, como mensagens de início de sessão ou de reposição, acaba mais facilmente no spam. Para domínios sem correio recomenda-se uma regra que rejeite tudo.",
+      "fix": "1. Criar em {domain} um registo TXT com os remetentes permitidos, p. ex. v=spf1 include:<fornecedor> -all. 2. Para um domínio sem correio: v=spf1 -all."
+    },
+    "dns.spf-multiple": {
+      "title": "Vários registos SPF para {domain}",
+      "explain": "Mais do que um registo SPF em {domain} é inválido; muitos recetores ignoram então o SPF por completo, e terceiros podem enviar correio em nome do domínio.",
+      "fix": "1. Juntar todos os registos SPF em um único registo TXT. 2. Manter os remetentes permitidos como include: e terminar com ~all ou -all."
+    },
+    "dns.spf-lax": {
+      "title": "A regra SPF de {domain} permite qualquer remetente ({policy})",
+      "explain": "O registo SPF termina com {policy}, pelo que qualquer servidor conta como permitido. Assim é fácil falsificar correio em nome de {domain}.",
+      "fix": "1. Substituir o final {policy} por ~all ou, melhor, -all. 2. Verificar antes que todos os remetentes legítimos estão listados."
+    },
+    "dns.dmarc-missing": {
+      "title": "Sem política DMARC para {domain}",
+      "explain": "Sem DMARC, os recetores não sabem o que fazer com correio falsificado em nome de {domain} e ninguém recebe relatórios de abuso. Para domínios sem correio recomenda-se p=reject.",
+      "fix": "1. Criar em _dmarc.{domain} um registo TXT v=DMARC1; p=none; rua=mailto:<endereço> e ler os relatórios. 2. Reforçar para p=quarantine e depois p=reject. 3. Para um domínio sem correio: v=DMARC1; p=reject."
+    },
+    "dns.dmarc-none": {
+      "title": "A política DMARC de {domain} apenas observa (p=none)",
+      "explain": "Com p=none, o correio falsificado em nome de {domain} é entregue na mesma. A política apenas recolhe relatórios.",
+      "fix": "1. Verificar nos relatórios DMARC os remetentes legítimos. 2. Reforçar a política para p=quarantine e mais tarde p=reject."
+    },
+    "csp.no-script-src": {
+      "title": "A CSP não restringe scripts",
+      "explain": "A Content-Security-Policy não tem script-src nem default-src, pelo que scripts de qualquer origem podem correr. Código injetado não é travado.",
+      "fix": "1. Acrescentar default-src 'self' ou um script-src com as origens necessárias. 2. Preferir nonces ou hashes a permissões amplas."
+    },
+    "csp.unsafe-inline": {
+      "title": "A CSP permite scripts inline ('unsafe-inline')",
+      "explain": "Com 'unsafe-inline' e sem nonce nem hash, também o código de script injetado é executado, o que remove grande parte da proteção da CSP.",
+      "fix": "1. Mover os scripts inline para ficheiros ou dar-lhes nonce ou hash. 2. Remover 'unsafe-inline' de script-src."
+    },
+    "csp.unsafe-eval": {
+      "title": "A CSP permite eval ('unsafe-eval')",
+      "explain": "'unsafe-eval' permite converter texto em código em tempo de execução, um caminho comum para código injetado.",
+      "fix": "1. Encontrar as bibliotecas ou o código que precisam de eval. 2. Substituí-los e remover 'unsafe-eval'."
+    },
+    "csp.wildcard": {
+      "title": "A origem de scripts {source} na CSP é demasiado ampla",
+      "explain": "A origem {source} na política de scripts permite scripts de uma gama muito vasta de servidores, incluindo alguns fora do controlo da aplicação.",
+      "fix": "1. Substituir {source} pelos servidores realmente necessários. 2. Preferir 'self' com nonces ou hashes."
+    },
+    "csp.object-src": {
+      "title": "A CSP não restringe object-src",
+      "explain": "Nem object-src nem default-src estão definidos, pelo que plugins e objetos incorporados não são restringidos.",
+      "fix": "1. Acrescentar object-src 'none'. 2. Em alternativa, definir um default-src restritivo."
+    },
+    "csp.report-only": {
+      "title": "A CSP está apenas em modo report-only",
+      "explain": "O cabeçalho Content-Security-Policy-Report-Only comunica violações, mas não bloqueia nada.",
+      "fix": "1. Verificar nos relatórios se há falsos alarmes. 2. Depois servir a política como Content-Security-Policy."
+    },
+    "deps.vulnerable": {
+      "title": "{library} {version} com vulnerabilidades conhecidas",
+      "explain": "O JavaScript entregue contém o {library} na versão {version}. Existem avisos de segurança para esta versão: {advisories}. As versões só são reconhecidas quando estão visíveis no bundle, e a lista é uma seleção curada, não exaustiva. Um aviso listado não significa que o aplicação use a função afetada.",
+      "fix": "1. Atualizar o {library} para a versão {fixed} ou superior. 2. Executar npm audit para encontrar outras dependências afetadas. 3. Voltar a compilar e a analisar o site."
+    },
+    "deps.eol": {
+      "title": "{library} {version} já não é mantido",
+      "explain": "O JavaScript entregue contém o {library} na versão {version}. Esta versão principal não recebe atualizações de segurança desde {eol}, pelo que novas vulnerabilidades não são corrigidas. As versões só são reconhecidas quando estão visíveis no bundle.",
+      "fix": "1. Mudar para uma versão principal atualmente mantida ou para um sucessor. 2. Executar npm audit para verificar as dependências. 3. Voltar a compilar e a analisar o site."
+    },
+    "build.dev-server": {
+      "title": "Servidor de desenvolvimento ({tool}) acessível publicamente",
+      "explain": "A página carrega scripts do servidor de desenvolvimento {tool}. Este serve código não minificado com indicações do código-fonte e não se destina a funcionar na internet.",
+      "fix": "1. Servir a aplicação a partir da compilação de produção (build e depois alojar de forma estática ou com o comando de arranque). 2. Não executar o servidor de desenvolvimento num endereço público. 3. Verificar depois que os scripts de desenvolvimento já não são carregados."
+    },
+    "build.dev-build": {
+      "title": "Compilação de desenvolvimento de {framework} em produção",
+      "explain": "A aplicação serve a variante de desenvolvimento de {framework}. É maior e mais lenta e expõe avisos detalhados e informação interna.",
+      "fix": "1. Gerar a aplicação com a compilação de produção (NODE_ENV=production ou a configuração de produção). 2. Servir apenas os ficheiros gerados. 3. Verificar que as indicações de desenvolvimento já não estão no código."
+    },
+    "errors.debug-page": {
+      "title": "Página de depuração de {framework} visível",
+      "explain": "Quando ocorre um erro, a aplicação mostra a interface de depuração de {framework}. Esta pode expor código-fonte, definições e variáveis de ambiente.",
+      "fix": "1. Desativar o modo de depuração em produção. 2. Configurar uma página de erro simples, sem detalhes técnicos. 3. Renovar os segredos que estavam visíveis na saída de depuração."
+    },
+    "errors.stacktrace": {
+      "title": "Página de erro mostra um stack trace",
+      "explain": "Uma página de erro contém detalhes técnicos como caminhos de ficheiros e nomes de funções. Isto facilita ataques dirigidos e revela como a aplicação é construída.",
+      "fix": "1. Desativar a saída de erros detalhada em produção. 2. Registar os erros apenas no registo do servidor. 3. Mostrar uma mensagem de erro genérica."
+    },
+    "errors.sql": {
+      "title": "Página de erro mostra mensagem de erro SQL",
+      "explain": "Uma resposta contém a mensagem de erro da base de dados. Revela tabelas, consultas ou o tipo de base de dados e indica muitas vezes entradas validadas de forma insuficiente.",
+      "fix": "1. Capturar os erros da base de dados e registá-los apenas no registo do servidor. 2. Mostrar uma mensagem genérica. 3. Passar as consultas a parâmetros em vez de concatenação de texto."
+    },
+    "errors.framework-page": {
+      "title": "Página de erro predefinida de {framework}",
+      "explain": "A página de erro vem inalterada de {framework}. Revela a tecnologia utilizada e indica tratamento de erros em falta.",
+      "fix": "1. Definir páginas de erro próprias para 404 e 500. 2. Não mostrar nelas detalhes técnicos."
+    },
+    "privacy.no-privacy-link": {
+      "title": "Ligação para a política de privacidade não encontrada",
+      "explain": "Na página inicial não foi encontrada nenhuma ligação cujo endereço ou texto aponte para uma política de privacidade. Quando uma aplicação trata dados pessoais (início de sessão, formulários, análise), costuma esperar-se uma política facilmente localizável. É uma indicação, não uma avaliação jurídica.",
+      "fix": "1. Preparar uma política de privacidade. 2. Ligá-la no rodapé de todas as páginas, p. ex. em /privacidade. 3. Verificar que a ligação funciona sem iniciar sessão."
+    },
+    "privacy.no-imprint-link": {
+      "title": "Ligação para o aviso legal não encontrada",
+      "explain": "Na página inicial não foi encontrada nenhuma ligação para um aviso legal (impressum). Na Alemanha e na Áustria é habitual esperar-se um para ofertas comerciais; noutros países é geralmente opcional. É uma indicação, não uma avaliação jurídica.",
+      "fix": "1. Verificar se um aviso legal é habitual para este site. 2. Se sim, criar uma página /aviso-legal e ligá-la no rodapé de todas as páginas."
+    },
+    "privacy.legal-unreachable": {
+      "title": "Página legal inacessível: {href}",
+      "explain": "A ligação {href} (aviso legal ou privacidade) responde com o estado {status}. Uma ligação que não leva a lado nenhum não ajuda os visitantes e é facilmente notada.",
+      "fix": "1. Verificar se existe uma página em {href} (rota, nome do ficheiro, maiúsculas/minúsculas). 2. Em aplicações de página única, garantir que a rota é servida no acesso direto. 3. Corrigir a ligação ou a página."
+    },
+    "ops.console-errors": {
+      "title": "{count} erros na consola do navegador",
+      "explain": "Ao carregar a página inicial foram registadas {count} mensagens de erro ou exceções não tratadas. Primeira mensagem: {sample}. Estes erros apontam muitas vezes para funcionalidades avariadas que os visitantes não reportam.",
+      "fix": "1. Carregar a página inicial com as ferramentas de programador abertas. 2. Corrigir os erros um a um. 3. Configurar monitorização de erros."
+    },
+    "ops.failed-requests": {
+      "title": "{count} pedidos falhados da página a si própria",
+      "explain": "Ao carregar a página inicial, {count} pedidos ao próprio domínio devolveram um erro ou falharam. Primeiro exemplo: {sample}. Muitas vezes são ficheiros em falta ou rotas de API avariadas.",
+      "fix": "1. Ver os pedidos no separador de rede das ferramentas de programador. 2. Disponibilizar os ficheiros em falta ou remover as referências. 3. Verificar as rotas de API."
+    },
+    "ops.console-secret": {
+      "title": "Chave secreta na consola do navegador",
+      "explain": "Ao carregar, a consola mostra algo que parece uma chave secreta ou token (service_role, sk-…, Bearer …). Quem abrir a página pode lê-lo.",
+      "fix": "1. Remover o registo no local afetado. 2. Tratar a chave como comprometida e renová-la. 3. Usar segredos apenas no servidor."
+    },
+    "mixed.active": {
+      "title": "{count} recursos ativos por http numa página https",
+      "explain": "Scripts, folhas de estilo, frames ou formulários são carregados ou enviados por http não cifrado, p. ex. {sample}. Os navegadores costumam bloquear, e a funcionalidade falha; onde não bloqueiam, terceiros podem alterar o conteúdo.",
+      "fix": "1. Passar os endereços para https (p. ex. {sample}). 2. Se o fornecedor não suportar https, substituir o recurso. 3. Opcionalmente definir upgrade-insecure-requests na CSP."
+    },
+    "mixed.passive": {
+      "title": "{count} imagens ou multimédia por http numa página https",
+      "explain": "Imagens, áudio ou vídeo são carregados por http não cifrado, p. ex. {sample}. Os navegadores mostram avisos ou não carregam o conteúdo.",
+      "fix": "1. Passar os endereços para https (p. ex. {sample}). 2. Alojar os ficheiros localmente, se necessário."
+    },
+    "sri.missing": {
+      "title": "{count} scripts ou folhas de estilo de terceiros sem verificação de integridade",
+      "explain": "São carregados ficheiros de outros servidores sem atributo integrity, p. ex. {sample}. Se o servidor de terceiros for comprometido ou o ficheiro substituído, o código alterado corre na aplicação.",
+      "fix": "1. Para ficheiros de CDN com versão fixa, acrescentar o atributo integrity (hash SRI) com crossorigin=\"anonymous\". 2. Em alternativa, alojar o ficheiro localmente. 3. Fixar a versão."
+    },
+    "server.php2shell": {
+      "title": "PHP {version}: versão no intervalo do PHP2Shell (pode já estar corrigida)",
+      "explain": "Os cabeçalhos de resposta indicam PHP {version}. Este número de versão está no intervalo de {advisories} (PHP2Shell, execução remota de código sem autenticação, CVSS 9.2). Corrigido no PHP 8.5.12, 8.4.27, 8.3.36 e 8.2.35; para 8.1 e anteriores não há correção oficial. As distribuições Linux costumam portar correções (backports) mantendo o número de versão antigo, por exemplo o Ubuntu 24.04 com 8.3.6. O número de versão apenas sugere a vulnerabilidade; o alojamento ou a distribuição pode já a ter corrigido.",
+      "fix": "1. Executar php -v e consultar o aviso de segurança da distribuição ou do serviço de alojamento para confirmar se a correção está incluída. 2. Caso contrário, atualizar para PHP {fixed} ou superior. 3. Ocultar a versão nos cabeçalhos de resposta."
+    },
+    "server.php-eol": {
+      "title": "PHP {version} já não recebe manutenção",
+      "explain": "Os cabeçalhos de resposta indicam PHP {version}. Este ramo já não recebe atualizações de segurança, pelo que novas vulnerabilidades não são corrigidas. Algumas distribuições mantêm ramos por mais tempo, o que não é visível do exterior.",
+      "fix": "1. Migrar para um ramo de PHP atualmente suportado (ver php.net/supported-versions). 2. Testar a aplicação e as extensões depois da migração. 3. Ocultar a versão nos cabeçalhos."
+    },
+    "server.php-eol-soon": {
+      "title": "PHP {version}: o suporte de segurança termina em {eol}",
+      "explain": "Os cabeçalhos de resposta indicam PHP {version}. O suporte de segurança deste ramo termina em {eol}; depois disso, novas vulnerabilidades deixam de ser corrigidas.",
+      "fix": "1. Planear a migração para um ramo de PHP mais recente. 2. Verificar a compatibilidade da aplicação e das extensões. 3. Migrar antes do fim do suporte."
+    },
+    "next.data-secret": {
+      "title": "Chave secreta nos dados da página Next.js ({provider})",
+      "explain": "Os dados que o Next.js incorpora na página HTML (__NEXT_DATA__ ou dados do App Router) contêm uma chave secreta ou um endereço de ligação a base de dados ({provider}). Qualquer visitante pode ler estes dados.",
+      "fix": "1. Revogar e renovar a credencial em {provider} de imediato. 2. Deixar de devolver o valor em getServerSideProps/getStaticProps ou de o passar como prop a componentes cliente. 3. Passar apenas os campos realmente necessários."
+    },
+    "next.data-pii": {
+      "title": "Dados pessoais nos dados da página Next.js ({count} indícios)",
+      "explain": "Os dados Next.js incorporados na página HTML contêm muitos endereços de e-mail, campos de palavra-passe ou marcações de administrador junto a listas de utilizadores (quantidade: {count}). Qualquer visitante pode lê-los. Os valores não são mostrados aqui.",
+      "fix": "1. Verificar que registos são passados à página. 2. Filtrar no servidor listas de utilizadores, hashes e papéis e passar apenas os campos necessários. 3. Redefinir as palavras-passe se houver hashes expostos."
+    },
+    "next.data-internal": {
+      "title": "Endereços internos nos dados da página Next.js ({count})",
+      "explain": "Os dados Next.js incorporados referem endereços internos (localhost, redes privadas ou nomes .internal, quantidade: {count}). Isto revela a estrutura da infraestrutura e sugere configuração de desenvolvimento.",
+      "fix": "1. Remover URLs internos dos dados passados à página. 2. Rever as variáveis de ambiente de produção. 3. Dar ao navegador apenas endereços acessíveis publicamente."
+    },
+    "ai.system-prompt-exposed": {
+      "title": "Prompt de sistema legível no código entregue ({count})",
+      "explain": "O JavaScript da página contém pelo menos um prompt de sistema em texto simples, começando por \"{sample}\" (quantidade: {count}). Qualquer visitante pode lê-lo. Se contiver regras de negócio, notas internas ou credenciais, estas ficam expostas.",
+      "fix": "1. Mover o prompt e a chamada de IA para um servidor ou função edge. 2. Nunca colocar segredos ou regras internas em prompts. 3. Reconstruir e confirmar que o texto já não está no bundle."
+    },
+    "privacy.third-party": {
+      "title": "{count} serviços externos são carregados",
+      "explain": "Ao carregar a página, são obtidos conteúdos ou scripts de servidores de terceiros: {list}. Pelo menos o endereço IP e dados do navegador seguem para esses fornecedores. A lista é uma indicação baseada numa seleção curada e não é exaustiva.",
+      "fix": "1. Verificar quais dos serviços indicados são realmente necessários. 2. Remover as integrações desnecessárias. 3. Mencionar os restantes na política de privacidade e, sempre que possível, alojá-los localmente."
+    },
+    "privacy.third-country": {
+      "title": "Serviços com sede fora da UE/EEE/Suíça",
+      "explain": "Pelo menos um serviço reconhecido pertence a uma empresa com sede fora da UE, do EEE e da Suíça: {list}. Os dados podem assim ser transferidos para países terceiros. É uma indicação, não uma avaliação jurídica.",
+      "fix": "1. Verificar se os serviços são necessários e se existe uma região ou fornecedor da UE. 2. Descrever a transferência na política de privacidade."
+    },
+    "privacy.google-fonts": {
+      "title": "Tipos de letra carregados dos servidores da Google",
+      "explain": "A página carrega tipos de letra de {host}. O endereço IP do visitante é enviado à Google (EUA) em cada pedido, antes de ser possível um consentimento.",
+      "fix": "1. Descarregar os tipos de letra necessários (por exemplo com fontsource ou google-webfonts-helper). 2. Distribuí-los como ficheiros com a aplicação e incluí-los com @font-face. 3. Remover as ligações a fonts.googleapis.com e fonts.gstatic.com."
+    },
+    "privacy.tracking-before-consent": {
+      "title": "Serviços de rastreamento carregados antes do consentimento",
+      "explain": "Ao carregar a página, sem qualquer clique num banner, são feitos pedidos a serviços de rastreamento: {list}. Ferramenta de consentimento detetada: {cmp}. Os dados seguem para esses fornecedores antes de ser possível um consentimento.",
+      "fix": "1. Carregar os scripts de rastreamento apenas após o consentimento. 2. Usar uma ferramenta de consentimento que bloqueie realmente os scripts. 3. Em alternativa, mudar para serviços sem cookies nem criação de perfis."
+    },
+    "privacy.consent-mode-denied": {
+      "title": "Google Consent Mode: pedidos chegam à Google apesar da recusa",
+      "explain": "Os pedidos a {list} têm o estado \"recusado\" (gcs=G100) e não foram definidos cookies de rastreamento. Ainda assim, pings sem cookies chegam à Google antes do consentimento. Ferramenta de consentimento detetada: {cmp}.",
+      "fix": "1. Verificar se os pings sem cookies são intencionais e estão descritos na política de privacidade. 2. Caso contrário, carregar os scripts da Google apenas após o consentimento."
+    },
+    "privacy.cookies-before-consent": {
+      "title": "Cookies de rastreamento definidos sem consentimento",
+      "explain": "Depois de a página carregar, sem qualquer interação, existem cookies que normalmente pertencem a rastreamento: {list}. Ferramenta de consentimento detetada: {cmp}.",
+      "fix": "1. Carregar os scripts que os definem apenas após o consentimento. 2. Apagar os cookies existentes quando o consentimento é recusado. 3. Verificar de novo com os cookies apagados."
+    },
+    "supabase.autoconfirm": {
+      "title": "Supabase: registo aberto e confirmação de email desativada",
+      "explain": "As definições públicas de autenticação do projeto Supabase permitem registos e confirmam automaticamente as novas contas, sem verificar o endereço de email. Qualquer pessoa pode criar uma conta confirmada com qualquer endereço, incluindo os de terceiros. Se as políticas das tabelas disserem \"qualquer utilizador autenticado pode ler tudo\", os dados ficam, na prática, públicos.",
+      "fix": "1. No Supabase, em Authentication, Providers, Email, ativar \"Confirm email\". 2. Rever as políticas que só verificam \"authenticated\" e passá-las para auth.uid() = user_id ou para perfis. 3. Se o registo livre não for desejado, desativar os registos."
+    },
+    "supabase.phone-autoconfirm": {
+      "title": "Supabase: números de telefone aceites sem confirmação",
+      "explain": "Com o registo aberto, as contas por número de telefone são confirmadas automaticamente. Nenhum código é verificado, pelo que qualquer número pode ser indicado. Isto facilita abusos e contas falsas.",
+      "fix": "1. No Supabase, em Authentication, Providers, Phone, ativar a confirmação por código SMS. 2. Se o início de sessão por telefone não for necessário, desativar o fornecedor."
+    },
+    "supabase.table-readable": {
+      "title": "A tabela \"{table}\" pode ser lida sem iniciar sessão",
+      "explain": "A chave pública do Supabase, presente no frontend, foi suficiente para ler a tabela \"{table}\" (colunas: {columns}, linhas: {rows}). Foi pedida apenas uma linha para provar o acesso; nenhum dado foi guardado e o relatório mostra apenas nomes de colunas. A falta de Row Level Security é a falha grave mais frequente em aplicações criadas com IA: qualquer pessoa com o URL do projeto consegue obter os dados.",
+      "fix": "1. No Supabase, ativar Row Level Security na tabela (ALTER TABLE ... ENABLE ROW LEVEL SECURITY). 2. Criar políticas, por exemplo USING (auth.uid() = user_id). 3. Retirar o privilégio SELECT à função anon onde não for necessário. 4. Consultar de novo com a chave anon e confirmar que não são devolvidas linhas."
+    },
+    "supabase.rpc-exposed": {
+      "title": "Supabase: {count} funções podem ser chamadas com a chave pública",
+      "explain": "O esquema da API do projeto lista funções da base de dados (RPC) que podem ser chamadas com a chave pública: {list}. As funções não foram executadas. As funções correm muitas vezes com permissões elevadas; nomes como admin, delete ou set indicam ações que não se destinam a visitantes anónimos.",
+      "fix": "1. Retirar a permissão de execução às funções anon e public (REVOKE EXECUTE ON FUNCTION ... FROM anon, public). 2. Verificar auth.uid() e o perfil dentro das funções. 3. Limitar ao mínimo as funções com permissões elevadas (SECURITY DEFINER) ou movê-las para um esquema não exposto."
+    },
+    "supabase.storage-public": {
+      "title": "Supabase: o bucket de armazenamento \"{bucket}\" é público",
+      "explain": "O bucket \"{bucket}\" está marcado como público. Os ficheiros nele podem ser obtidos por qualquer pessoa que conheça o caminho. Isso é pretendido para imagens e transferências, mas não para ficheiros privados como faturas ou carregamentos de utilizadores.",
+      "fix": "1. Verificar se o bucket só contém ficheiros que devem ser públicos. 2. Mover os ficheiros privados para um bucket não público e disponibilizá-los com URLs assinados. 3. Rever as políticas de armazenamento para escrita e eliminação."
+    },
+    "firebase.rtdb-open": {
+      "title": "Firebase: Realtime Database legível sem autenticação",
+      "explain": "A Realtime Database do projeto responde a pedidos sem autenticação. Como prova, foi feito apenas um pedido \"shallow\", que devolve só os nomes das chaves do nível superior ({keys} chaves, p. ex. {sample}). Nenhum valor foi lido ou guardado. A causa habitual são Firebase Security Rules como \".read\": true ou o modo de teste, que deveria bloquear após o prazo, mas costuma ser prolongado. Quem conhecer o URL da base de dados (consta no código do navegador) pode ler todos os dados e, com \".write\": true, também alterá-los ou apagá-los.",
+      "fix": "1. Na Firebase Console, em Realtime Database, Regras, deixar de definir \".read\" e \".write\" como true. 2. Associar o acesso à autenticação, p. ex. \"auth != null\", e restringir por utilizador, p. ex. \"auth.uid === $uid\". 3. Testar as regras no simulador sem sessão iniciada e repetir a análise."
+    },
+    "firebase.firestore-open": {
+      "title": "Firebase: coleção Firestore \"{collection}\" legível sem autenticação",
+      "explain": "A coleção Firestore \"{collection}\" devolveu um documento com a chave de API pública da aplicação, sem autenticação. Como prova, foi pedido exatamente um documento; apenas os nomes dos campos ({fields}) foram guardados, sem valores. As causas habituais são Firebase Security Rules como \"allow read, write: if true\" ou o modo de teste com prazo prolongado. Se os campos contiverem dados pessoais, trata-se de um incidente grave de proteção de dados.",
+      "fix": "1. Na Firebase Console, em Firestore, Regras, remover \"allow read, write: if true\". 2. Partir de \"request.auth != null\" e verificar por documento, p. ex. \"request.auth.uid == resource.data.userId\". 3. Bloquear as coleções que o cliente não necessita e testar as regras no simulador de regras. 4. Repetir a análise."
+    },
+    "firebase.storage-listable": {
+      "title": "Firebase: lista de ficheiros do bucket \"{bucket}\" acessível sem autenticação",
+      "explain": "O bucket do Cloud Storage \"{bucket}\" devolve a lista de ficheiros sem autenticação. Como prova, foi pedida apenas uma entrada; nem o nome nem o conteúdo do ficheiro foram guardados. A causa habitual são regras do Storage como \"allow read: if true\" ou o modo de teste. Com a lista, todos os ficheiros carregados podem ser encontrados e descarregados.",
+      "fix": "1. Na Firebase Console, em Storage, Regras, remover \"allow read: if true\". 2. Associar leitura e escrita a \"request.auth != null\" e separar os caminhos por utilizador, p. ex. \"request.auth.uid == userId\" para \"users/{userId}/...\". 3. Libertar explicitamente, num caminho próprio, os ficheiros que devem ficar públicos. 4. Repetir a análise."
+    },
+    "paths.env-exposed": {
+      "title": "Ficheiro de configuração {path} acessível publicamente",
+      "explain": "O ficheiro {path} pode ser obtido sem início de sessão. Contém definições com estes nomes: {keys}. Os valores não foram guardados. Estes ficheiros costumam conter credenciais e qualquer pessoa que conheça o URL pode lê-los.",
+      "fix": "1. Remover imediatamente o ficheiro da pasta pública ou do build. 2. Tratar todas as chaves e palavras-passe nele como comprometidas e emitir novas. 3. Configurar o servidor para nunca servir ficheiros que começam por ponto."
+    },
+    "paths.git-exposed": {
+      "title": "Dados de controlo de versões ({path}) acessíveis publicamente",
+      "explain": "O ficheiro {path} pode ser obtido. Isto permite muitas vezes reconstruir todo o código-fonte e o histórico, incluindo credenciais removidas entretanto.",
+      "fix": "1. Remover a pasta .git ou .svn da pasta pública. 2. Adicionar uma regra no servidor web que bloqueie estes caminhos. 3. Renovar as chaves presentes no histórico."
+    },
+    "paths.backup-exposed": {
+      "title": "Ficheiro de cópia de segurança ou dump {path} acessível",
+      "explain": "Existe um ficheiro transferível em {path} (tamanho: {size} bytes). Cópias de segurança e dumps de bases de dados contêm frequentemente dados de clientes e credenciais. O conteúdo não foi transferido.",
+      "fix": "1. Remover o ficheiro da pasta pública. 2. Renovar as credenciais incluídas e verificar no registo de acessos se já foi transferido. 3. Guardar cópias de segurança fora da raiz web ou em armazenamento protegido."
+    },
+    "paths.info-exposed": {
+      "title": "Ficheiro interno ou página de estado {path} acessível",
+      "explain": "O caminho {path} devolve informação de configuração ou diagnóstico (por exemplo estado do servidor, informação do PHP, definições do editor ou de contentores). Isto facilita ataques dirigidos e revela estrutura e versões.",
+      "fix": "1. Remover o ficheiro ou a página da pasta pública ou protegê-los com controlo de acesso. 2. Tornar as páginas de diagnóstico acessíveis só internamente ou após início de sessão. 3. Ajustar o build para que ficheiros de desenvolvimento não sejam publicados."
+    },
+    "paths.admin-open": {
+      "title": "Área de administração {path} acessível sem formulário de início de sessão",
+      "explain": "O caminho {path} responde com uma página que parece um painel e não tem campo de palavra-passe. Pode indicar uma área de administração desprotegida; é uma observação, não uma prova.",
+      "fix": "1. Verificar se a página oferece funções ou dados reais sem início de sessão. 2. Restringir o acesso no servidor a administradores autenticados. 3. Considerar uma restrição adicional por IP ou um segundo fator."
+    },
+    "dns.dangling": {
+      "title": "Registo DNS órfão: {host} aponta para {target}",
+      "explain": "{host} é um CNAME para {target}, mas esse destino não devolve endereço. O serviço foi provavelmente eliminado. Outra pessoa poderia registar o mesmo nome aí e servir conteúdo em {host} (tomada de subdomínio), por exemplo páginas de phishing ou roubo de cookies.",
+      "fix": "1. Remover o registo CNAME de {host} do DNS se já não for necessário. 2. Caso contrário, recriar o serviço em {target} e associar novamente o domínio. 3. Rever regularmente os registos DNS à procura de destinos que já não existem."
+    },
+    "wellknown.securitytxt-missing": {
+      "title": "Nenhum security.txt encontrado",
+      "explain": "Em /.well-known/security.txt não está publicado um contacto para comunicações de segurança. Quem descobrir uma vulnerabilidade não sabe a quem a comunicar.",
+      "fix": "1. Criar o ficheiro /.well-known/security.txt (RFC 9116). 2. Indicar pelo menos Contact: e Expires:. 3. Verificar que o ficheiro é servido como texto e não como HTML."
+    },
+    "wellknown.securitytxt-expired": {
+      "title": "O security.txt expirou",
+      "explain": "O campo Expires do security.txt está no passado ({date}). Segundo a RFC 9116, indicações expiradas deixam de ser consideradas fiáveis.",
+      "fix": "1. Verificar os dados de contacto. 2. Definir Expires para uma data até um ano. 3. Incluir a renovação no calendário ou no processo de implementação."
+    },
+    "wellknown.securitytxt-incomplete": {
+      "title": "security.txt sem Expires válido",
+      "explain": "O security.txt não tem um campo Expires (legível). A RFC 9116 exige Contact e Expires.",
+      "fix": "1. Acrescentar uma linha Expires: com data como 2027-06-01T00:00:00Z. 2. Abrir o ficheiro novamente e verificar."
+    },
+    "wellknown.robots-sensitive": {
+      "title": "O robots.txt lista caminhos com aspeto sensível",
+      "explain": "O robots.txt público tem {count} entradas Disallow que parecem áreas internas (p. ex. {sample}). O robots.txt é legível por todos e não protege: Disallow não é controlo de acesso, é uma indicação para motores de busca e mostra onde algo se encontra.",
+      "fix": "1. Garantir que estas áreas estão protegidas por autenticação ou regras de rede. 2. Remover do robots.txt os caminhos que não devem ser divulgados e usar noindex ou proteção de acesso."
+    },
+    "wellknown.robots-blocks-all": {
+      "title": "Site bloqueado para motores de busca",
+      "explain": "A página inicial está bloqueada para motores de busca através de {sources} (Disallow: / ou noindex). Não aparece nos resultados de pesquisa. Pode ser intencional, por exemplo em versões de teste.",
+      "fix": "1. Verificar se o bloqueio é intencional no site de produção. 2. Se não for, remover Disallow: / ou noindex."
+    },
+    "deps.generator-outdated": {
+      "title": "Versão do gerador possivelmente desatualizada",
+      "explain": "A etiqueta generator indica {name} {version}. Segundo uma pequena tabela interna (estado: {date}, a verificar), {advisory} afeta versões abaixo de {min}. Se a configuração afetada existe de facto não é visível do exterior.",
+      "fix": "1. Verificar o aviso junto do fabricante. 2. Atualizar para {min} ou superior e voltar a publicar. 3. Opcionalmente remover a etiqueta generator."
+    },
+    "api.unauth-data": {
+      "title": "A interface {path} devolve dados sem início de sessão",
+      "explain": "Um pedido GET anónimo (sem cookies nem credenciais) a {path} devolveu dados JSON: {count} entradas, campos {fields}. Só foram guardados o número e os nomes dos campos, nenhum valor. Se os dados não devem ser públicos, qualquer pessoa com o endereço pode lê-los.",
+      "fix": "1. Clarificar se a interface deve ser pública. 2. Se não: verificar a autenticação no servidor e limitar o acesso aos registos da própria pessoa. 3. Devolver apenas os campos necessários. 4. Repetir o pedido sem sessão e confirmar que responde 401 ou 403."
+    },
+    "auth.client-only": {
+      "title": "O controlo de acesso das áreas de administração parece existir só no navegador",
+      "explain": "O código do frontend contém rotas de administração ({routes}) juntamente com verificações de papel como role === \"admin\", mas nenhuma interface em /api/admin nem Edge Functions com \"admin\" no nome. É uma pista, não uma prova. Esconder a interface não protege dados: quem chamar as interfaces diretamente contorna qualquer verificação no navegador. Os direitos têm de ser impostos no servidor ou na base de dados (Row Level Security).",
+      "fix": "1. Verificar se as ações de administração validam o papel no servidor. 2. No Supabase, usar Row Level Security com verificação de papel baseada em app_metadata ou numa tabela de papéis, não em user_metadata (alterável pela pessoa). 3. Executar interfaces de administração só após verificação de papel no servidor. 4. Testar com uma conta normal que as chamadas são rejeitadas."
+    },
+    "cors.reflect-credentials": {
+      "title": "O CORS reflete qualquer origem e permite credenciais ({path})",
+      "explain": "A resposta de {path} devolveu em Access-Control-Allow-Origin a origem de um domínio alheio e inventado e permitiu ao mesmo tempo credenciais (Access-Control-Allow-Credentials: true). Assim, outros sites podem ler respostas desta interface em nome de pessoas autenticadas.",
+      "fix": "1. Restringir as origens permitidas a uma lista fixa de domínios próprios; nunca devolver o cabeçalho Origin sem verificação. 2. Enviar Allow-Credentials só para essa lista. 3. Testar de novo com uma origem alheia e confirmar que não volta nenhum cabeçalho Allow-Origin."
+    },
+    "cors.wildcard-credentials": {
+      "title": "O CORS combina origem genérica com credenciais ({path})",
+      "explain": "A resposta de {path} contém Access-Control-Allow-Origin: * juntamente com Access-Control-Allow-Credentials: true. Os navegadores recusam esta combinação, mas ela revela uma configuração CORS errada que facilmente passa a refletir qualquer origem quando alguém a \"corrige\" mais tarde.",
+      "fix": "1. Decidir se a interface precisa de credenciais. 2. Se sim: usar uma lista fixa de origens próprias em vez de *. 3. Se não: remover Allow-Credentials."
+    },
+    "cors.reflect": {
+      "title": "O CORS reflete qualquer origem ({path})",
+      "explain": "A resposta de {path} devolveu em Access-Control-Allow-Origin a origem de um domínio alheio e inventado, sem permitir credenciais. Em dados públicos isto é muitas vezes intencional; em dados não públicos a lista de origens permitidas deve ser limitada.",
+      "fix": "1. Verificar se a interface deve ser legível a partir de qualquer site. 2. Se não: usar uma lista fixa de origens próprias. 3. Testar de novo com uma origem alheia."
     }
   }
 }

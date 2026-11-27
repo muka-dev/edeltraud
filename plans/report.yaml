@@ -1,19 +1,47 @@
-# Paid report: all passive modules. Wave 2 adds collect.render (browser), crawl, DNS, privacy, a11y.
+# Paid report: all passive modules, with a headless browser (collect.render). Runs in the worker image.
 plan: report
 version: 1
-limits: { totalMs: 120000, requests: 400, browser: false }
+limits: { totalMs: 120000, requests: 400, browser: true }
 modules:
   - collect.page
   - collect.bundles: { maxBundles: 80, followLazyChunks: true }
   - collect.sourcemaps: { headOnly: true, maxMaps: 20 }
+  - collect.tls
+  - collect.render: { waitMs: 4000, maxRequests: 300 }
+  - collect.dns
+  - collect.legal
+  - collect.wellknown
+  - collect.errorpages
   - stack.detect
   - secrets.frontend
+  - deps.vulnerable
+  - build.dev-mode
+  - errors.verbose
+  - privacy.legal-pages
+  - ops.errors-console
+  - mixed.content
+  - sri.missing
+  - privacy.third-party
+  - privacy.google-fonts
+  - privacy.consent-before-tracking
+  - deps.server
+  - next.data-leak
+  - ai.system-prompt-exposed
   - headers.security
+  - headers.csp-quality
   - cookies.flags
   - tls.basics
+  - dns.mail
+  - dns.dangling
+  - wellknown.securitytxt
+  - wellknown.robots-hints
+  - stack.generator
+  - endpoints.discovered
+  - auth.client-only
   - sourcemaps.exposed
   - supabase.config
   - firebase.config
+  - supabase.auth-settings
   - ai.client-llm-call
 presentation:
   showFindings: all

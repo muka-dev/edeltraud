@@ -3,7 +3,7 @@
 Stand: 20.11.2026 · Status: Entwurf
 
 Spalten: **A** = Ampel (kostenlos), **B** = Bericht, **T** = Tiefenprüfung
-(Nachweis der Inhaberschaft), **W** = Wache. **Modus** passiv/aktiv,
+(Nachweis der Inhaberschaft), **W** = WatchDog. **Modus** passiv/aktiv,
 **Art** Sammler (C), Analyse (A), Probe (P). **Welle** = geplante Reihenfolge
 der Entwicklung (1 = erste Version).
 
@@ -14,6 +14,38 @@ der Entwicklung (1 = erste Version).
 zusätzlich OpenRouter, Groq, xAI, Replicate, Hugging Face, SendGrid, Resend,
 Slack, neue Supabase-Secret-Keys und Gemini-Schlüssel (Google-Key in der
 Nähe eines Gemini-Aufrufs).
+
+**Umgesetzt in Welle 2, Teil "Rest" (20.11.2026):** `collect.tls`
+(Ablaufdatum relativ zur Laufzeit, TLS 1.0/1.1; in der Ampel ohne alte
+Protokolle), `collect.dns` + `dns.mail`, `collect.errorpages` +
+`errors.verbose`, `build.dev-mode`, `deps.vulnerable` (eigene kleine
+Datenbank in `src/modules/analyze/deps-db.ts`, Stand 20.11.2026, nicht
+vollständig), `headers.csp-quality`. Die Ablaufwarnung steckt in
+`tls.basics` (Version 0.2.0).
+
+**Umgesetzt in Welle 2, Teil "Browser" (20.11.2026):** `collect.render`
+(Headless-Chromium, keine Klicks), `privacy.third-party` (mit
+`privacy.third-country`), `privacy.google-fonts`,
+`privacy.consent-before-tracking` (inkl. Google Consent Mode "denied"),
+`collect.legal` + `privacy.legal-pages`, `ops.errors-console`,
+`mixed.content`, `sri.missing`. Zusätzlich vorgezogen bzw. neu:
+`deps.server` (PHP2Shell CVE-2026-109618/109619, PHP end of life),
+`next.data-leak`, `ai.system-prompt-exposed`, Next.js-Fixes vom
+August 2026 in `deps.vulnerable`. Drittanbieter-Liste:
+`src/modules/analyze/thirdparty-db.ts`.
+
+**Umgesetzt in Welle 3, Teil Supabase (20.11.2026):** Nachweis der
+Inhaberschaft (`src/ownership/`), `supabase.auth-settings` (passiv),
+`supabase.rls-read`, `supabase.rpc-exposed`, `supabase.storage-public`
+(aktiv, nur mit Nachweis).
+
+**Umgesetzt in Welle 3/4 (21.11.2026):** `collect.wellknown`,
+`wellknown.securitytxt`, `wellknown.robots-hints`, `stack.generator`,
+`endpoints.discovered`, `auth.client-only`, `dns.dangling` (passiv);
+`api.unauth`, `cors.policy`, `paths.sensitive`, `firebase.rtdb-open`,
+`firebase.firestore-open`, `firebase.storage-open` (aktiv, nur mit
+Nachweis). Bei allen aktiven Proben gilt: nur GET/HEAD, höchstens ein
+Datensatz, im Ergebnis nur Namen und Anzahlen, nie Werte.
 
 Alle Befunde sind Auffälligkeiten, keine Aussage über die Sicherheit oder
 Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
@@ -28,7 +60,8 @@ Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 | `collect.tls` | Zertifikat, Protokolle, Weiterleitung http→https | C | ✓ | ✓ | ✓ | ✓ | 1 |
 | `collect.render` | Seite im Headless-Browser, alle Netzwerkanfragen, Cookies, DOM, Konsole | C | – | ✓ | ✓ | ✓ | 2 |
 | `collect.crawl` | Bis zu N interne Seiten (Sitemap, Links, Routen aus dem Bundle) | C | – | ✓ | ✓ | ✓ | 2 |
-| `collect.dns` | A/AAAA, CNAME, MX, SPF, DMARC, CAA | C | – | ✓ | ✓ | ✓ | 2 |
+| `collect.dns` | A/AAAA, CNAME, MX, SPF, DMARC, CAA; erkennt Plattform-Domains (vercel.app, lovable.app …) | C | – | ✓ | ✓ | ✓ | 2 |
+| `collect.errorpages` | Zwei feste, nicht vorhandene Pfade (`/edeltraud-check-404`, `/api/edeltraud-check-404`) per GET | C | – | ✓ | ✓ | ✓ | 2 |
 | `collect.wellknown` | robots.txt, sitemap.xml, security.txt, manifest | C | – | ✓ | ✓ | ✓ | 2 |
 | `collect.sourcemaps` | Inhalte ausgelieferter `*.map` | C | – | ✓ | ✓ | ✓ | 2 |
 
@@ -50,10 +83,11 @@ Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 | `cookies.flags` | Secure, HttpOnly, SameSite, Lebensdauer von Sitzungs-Cookies | mittel | – | ✓ | ✓ | ✓ | 2 |
 | `tls.basics` | Zertifikat gültig, Ablauf bald, http→https, HSTS-Preload | mittel | ✓ | ✓ | ✓ | ✓ | 1 |
 | `deps.vulnerable` | Bibliotheken mit bekannten Lücken, soweit Version erkennbar | hoch–mittel | – | ✓ | ✓ | ✓ | 2 |
+| `deps.server` | Server-Software aus Headern: PHP2Shell (CVE-2026-109618/109619), PHP end of life; nur "möglich", weil Distributionen Fixes zurückportieren | hoch | ✓ | ✓ | ✓ | ✓ | 2 |
 | `build.dev-mode` | Entwicklungs-Build in Produktion, Debug-Ausgaben, Vite-Dev-Server, React-DevTools-Hinweise | mittel | – | ✓ | ✓ | ✓ | 2 |
-| `next.data-leak` | Interne Daten in `__NEXT_DATA__` / Server-Props | hoch | – | ✓ | ✓ | ✓ | 3 |
+| `next.data-leak` | Schlüssel, Verbindungs-URLs, E-Mail-Listen, Passwort-Hashes, interne Hosts in `__NEXT_DATA__` und RSC-Flight-Daten | kritisch–niedrig | ✓ | ✓ | ✓ | ✓ | 2 |
 | `errors.verbose` | Stacktraces, Framework-Fehlerseiten, SQL-Fehler auf 404/500 | mittel | – | ✓ | ✓ | ✓ | 2 |
-| `sri.missing` | Fremde Skripte ohne Subresource Integrity | niedrig | – | ✓ | ✓ | ✓ | 3 |
+| `sri.missing` | Fremde Skripte ohne Subresource Integrity | niedrig | – | ✓ | ✓ | ✓ | 2 |
 | `mixed.content` | http-Ressourcen auf https-Seiten | mittel | – | ✓ | ✓ | ✓ | 2 |
 | `dns.mail` | SPF, DMARC fehlen oder zu lax (wichtig, wenn die App Mails versendet) | mittel | – | ✓ | ✓ | ✓ | 2 |
 | `dns.dangling` | CNAME auf nicht mehr existierende Dienste (Übernahme-Gefahr) | hoch | – | ✓ | ✓ | ✓ | 3 |
@@ -111,6 +145,7 @@ Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 | `privacy.consent-before-tracking` | Tracker/Cookies vor jeder Einwilligung geladen | – | ✓ | ✓ | ✓ | 2 |
 | `privacy.google-fonts` | Schriften direkt von Google geladen | – | ✓ | ✓ | ✓ | 2 |
 | `privacy.legal-pages` | Impressum und Datenschutzerklärung verlinkt und erreichbar | ✓ | ✓ | ✓ | ✓ | 2 |
+| `privacy.third-country` | Erkannte Dienste mit Firmensitz außerhalb EU/EWR/CH | ✓ | ✓ | ✓ | ✓ | 2 |
 | `privacy.forms` | Formulare mit personenbezogenen Feldern, Ziel der Übermittlung | – | ✓ | ✓ | ✓ | 3 |
 | `privacy.llm-data-flow` | Eingaben gehen an LLM-Anbieter außerhalb der EU | – | ✓ | ✓ | ✓ | 3 |
 
@@ -134,7 +169,7 @@ Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 
 ## Umfang je Stufe (Ziel nach Welle 3)
 
-| | Ampel | Bericht | Tiefenprüfung | Wache |
+| | Ampel | Bericht | Tiefenprüfung | WatchDog |
 |---|---|---|---|---|
 | Module | ca. 10 | ca. 40 | ca. 55 | wie Bericht, aktiv monatlich |
 | Dauer | < 15 s | 1–2 min | 2–5 min | im Hintergrund |

@@ -28,7 +28,10 @@ export const supabaseConfig: CheckModule = {
           ...(url ? { vars: { project: new URL(url).hostname } } : {}),
         }),
       ],
-      notChecked: [{ module: 'supabase.rls-read', reason: 'ownership', detail: 'row level security needs the deep check' }],
+      // With proof of ownership the deep check runs supabase.rls-read itself.
+      ...(ctx.target.ownershipVerified
+        ? {}
+        : { notChecked: [{ module: 'supabase.rls-read', reason: 'ownership' as const, detail: 'row level security needs the deep check' }] }),
     };
   },
 };

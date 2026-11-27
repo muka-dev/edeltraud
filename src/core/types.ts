@@ -133,6 +133,89 @@ export interface Http {
   fetch(req: HttpRequest): Promise<HttpResponse>;
 }
 
+export type DnsRecordType = 'A' | 'AAAA' | 'CNAME' | 'MX' | 'TXT' | 'CAA';
+
+/**
+ * DNS lookups for collectors. Answers are normalised strings:
+ * MX 'priority host', TXT chunks joined, CAA 'flags tag "value"'.
+ * No data / no such name gives []; other failures (timeout, SERVFAIL) throw.
+ */
+export interface Dns {
+  resolve(name: string, type: DnsRecordType): Promise<string[]>;
+}
+
+export interface TlsInfo {
+  host: string;
+  port: number;
+  /** ISO time of the handshake; analyzers compute remaining validity from it (deterministic). */
+  checkedAt: string;
+  /** Negotiated protocol, e.g. 'TLSv1.3'. */
+  protocol: string | null;
+  /** Certificate chain accepted by Node's trust store for this host name. */
+  authorized: boolean;
+  authorizationError: string | null;
+  validFrom: string | null;
+  validTo: string | null;
+  issuer: string | null;
+  subject: string | null;
+  altNames: string[];
+  /** Legacy protocols accepted by the server: true/false, null = not tested or inconclusive. */
+  legacy: { 'TLSv1': boolean | null; 'TLSv1.1': boolean | null };
+}
+
+export interface TlsInspector {
+  inspect(host: string, opts?: { port?: number; legacyProtocols?: boolean }): Promise<TlsInfo>;
+}
+
+export interface RenderRequest {
+  url: string;
+  method: string;
+  /** Playwright resource type: document, script, stylesheet, image, font, xhr, fetch, ping, other … */
+  resourceType: string;
+  /** null if the request failed or was blocked. */
+  status: number | null;
+  failure: string | null;
+}
+
+export interface RenderCookie {
+  name: string;
+  domain: string;
+  path: string;
+  /** Unix seconds, -1 for session cookies. */
+  expires: number;
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: string;
+}
+
+/**
+ * What a headless browser saw while loading the page once, without any interaction.
+ * Everything here happened before a visitor could click a consent banner.
+ */
+export interface RenderData {
+  url: string;
+  finalUrl: string;
+  status: number | null;
+  /** DOM after scripts ran. */
+  html: string;
+  title: string;
+  requests: RenderRequest[];
+  cookies: RenderCookie[];
+  /** Keys only, never values. */
+  storage: { local: string[]; session: string[] };
+  console: { type: string; text: string; url: string | null }[];
+  pageErrors: string[];
+  links: { href: string; text: string }[];
+  /** Requests the scanner refused because they pointed to internal addresses. */
+  blocked: string[];
+  /** The request limit cut the page load short. */
+  limitReached: boolean;
+}
+
+export interface Browser {
+  render(url: string, opts: { waitMs: number; maxRequests: number; timeoutMs: number }): Promise<RenderData>;
+}
+
 export interface ArtifactReader {
   get(type: string, key: string): Artifact | undefined;
   list(type: string): Artifact[];
@@ -149,6 +232,12 @@ export interface ModuleContext {
   facts: FactReader;
   /** Only for collectors and probes. */
   http?: Http;
+  /** Only for collectors and probes. Absent in replay runs without DNS fixtures. */
+  dns?: Dns;
+  /** Only for collectors and probes. Absent in replay runs without TLS fixtures. */
+  tls?: TlsInspector;
+  /** Only for modules with budget.browser in plans that allow a browser. */
+  browser?: Browser;
   log: Logger;
   signal: AbortSignal;
 }

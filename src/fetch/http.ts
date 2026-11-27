@@ -11,7 +11,7 @@ export const USER_AGENT = 'EDEL.TRAUD.AI/0.1 (+https://m-ko.de/scan; passive che
 const lookupAll = promisify(dnsLookup);
 
 /** DNS lookup that refuses private addresses, so the connected IP is always checked. */
-const safeLookup: LookupFunction = (hostname, options, callback) => {
+export const safeLookup: LookupFunction = (hostname, options, callback) => {
   dnsLookup(hostname, { ...options, all: true }, (err, addresses) => {
     if (err) return callback(err, '', 4);
     const list = addresses as unknown as { address: string; family: number }[];
