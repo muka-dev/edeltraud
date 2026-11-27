@@ -7,6 +7,8 @@ modules:
   - collect.page
   - collect.bundles: { maxBundles: 5, followLazyChunks: false }
   - collect.sourcemaps: { headOnly: true, maxMaps: 2 }
+  - collect.tls: { legacyProtocols: false }
+  - collect.legal
   - stack.detect
   - secrets.frontend
   - headers.security
@@ -16,6 +18,10 @@ modules:
   - supabase.config
   - firebase.config
   - ai.client-llm-call
+  - privacy.legal-pages
+  - privacy.third-party
+  - deps.server
+  - next.data-leak
 presentation:
   showFindings: 3
   fixPrompts: false

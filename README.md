@@ -24,15 +24,33 @@ npm run export:core -- ../edeltraud   # offenen Kern (AGPL) ohne private Teile e
 
 CLI-Exit-Codes: 0 grün/gelb, 1 rot, 2 Bedienfehler, 3 unvollständig (Ampel grau).
 
-API:
+API (liefert unter `scan.m-ko.de` auch die Ampel-Seite aus `web/`):
 
 ```
-POST /v1/scan   { "url": "example.com", "lang": "de" }   → Ampel-Ergebnis (de, en, pt, pt-BR)
+GET  /v1/challenge                                        → Rechenaufgabe (Proof of Work)
+POST /v1/scan   { "url": "example.com", "lang": "de", "pow": {…} }  → Ampel-Ergebnis (de, en, pt, pt-BR)
 GET  /health
+GET  /                                                    → Ampel-Seite
 ```
+
+Schutz vor Missbrauch der kostenlosen Ampel:
+
+- **Proof of Work:** Vor jedem Scan löst der Browser eine kleine Rechenaufgabe
+  (Stufe 16 ≈ 65.000 Hashes, unter 2 s). Jede Aufgabe gilt für genau einen
+  Scan. Kein Dienst eines Dritten, kein Cookie, kein Tracking.
+- **Grenzen pro Client:** 3/Minute, 10/Stunde, 30/Tag; IPv6 zählt pro /64.
+- **Grenze pro Ziel:** 20/Stunde je registrierbarer Domain (Subdomains zählen
+  zusammen). Ergebnisse aus dem Cache (10 Minuten) zählen nicht.
+- **Gesamt:** 300 Scans/Stunde, höchstens 4 gleichzeitig (sonst 503 mit
+  `Retry-After`; dabei wird kein Kontingent verbraucht).
+- **Opt-out:** Domains, deren Betreiber keine Scans wollen, in `BLOCKED_DOMAINS`.
+- Die Zähler liegen im Speicher eines Prozesses. Bei mehreren Instanzen
+  gehören sie in einen gemeinsamen Speicher (z. B. Redis).
 
 Umgebungsvariablen der API: `PORT`, `ALLOWED_ORIGINS` (kommagetrennt),
-`TRUST_PROXY=1` hinter eigenem Reverse Proxy.
+`TRUST_PROXY=1` hinter eigenem Reverse Proxy (sonst zählt die Proxy-IP),
+`POW_SECRET` (fester Schlüssel, damit Aufgaben einen Neustart überstehen),
+`POW_DIFFICULTY` (Standard 16), `BLOCKED_DOMAINS` (kommagetrennt).
 
 ## Aufbau
 

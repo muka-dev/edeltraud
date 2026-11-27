@@ -32,6 +32,10 @@ export interface Presented {
   disclaimer: string;
   stack: string[];
   durationMs: number;
+  /** ISO time the scan started. */
+  startedAt: string;
+  /** False if something could not be checked; 'nothing found' then means less. */
+  complete: boolean;
 }
 
 /**
@@ -79,6 +83,8 @@ export function present(result: ScanResult, plan: Plan, lang: Lang): Presented {
     disclaimer: ui(lang, 'disclaimer'),
     stack: (result.facts['stack'] as string[] | undefined) ?? [],
     durationMs: result.durationMs,
+    startedAt: result.startedAt,
+    complete: result.complete,
   };
   if (lockedList.length) out.lockedText = ui(lang, 'locked', { list: lockedList.join(', ') });
   return out;

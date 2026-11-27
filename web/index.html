@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de"
+  data-title-de="EDEL.TRAUD.AI: Schnellcheck für KI-gebaute Apps"
+  data-title-en="EDEL.TRAUD.AI: quick check for AI-built apps"
+  data-title-pt="EDEL.TRAUD.AI: verificação rápida para apps feitas com IA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EDEL.TRAUD.AI: Schnellcheck für KI-gebaute Apps</title>
+  <meta name="description" content="Trau, schau, wem. Passiver Schnellcheck für KI-gebaute Web-Apps: Schlüssel im Frontend, Header, Supabase- und Firebase-Hinweise und mehr.">
+  <meta name="author" content="Markus Kosmal">
+  <meta name="theme-color" content="#12332E">
+  <meta name="robots" content="index,follow">
+  <!-- Link previews (LinkedIn, Slack, X, Mastodon …). Image: scripts/og/render.cjs -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="EDEL.TRAUD.AI">
+  <meta property="og:url" content="https://scan.m-ko.de/">
+  <meta property="og:title" content="EDEL.TRAUD.AI: Schnellcheck für KI-gebaute Apps">
+  <meta property="og:description" content="Trau, schau, wem. Kostenlose Ampel in unter 15 Sekunden: Schlüssel im Frontend, Sicherheits-Header, Hinweise auf Supabase und Firebase. Für Apps aus Lovable, Cursor, Bolt und Co.">
+  <meta property="og:image" content="https://scan.m-ko.de/og.png">
+  <meta property="og:image:secure_url" content="https://scan.m-ko.de/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="627">
+  <meta property="og:image:alt" content="EDEL.TRAUD.AI – Trau, schau, wem. Schnellcheck für KI-gebaute Apps mit Ampel, kostenlos auf scan.m-ko.de">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="pt_PT">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EDEL.TRAUD.AI: Schnellcheck für KI-gebaute Apps">
+  <meta name="twitter:description" content="Trau, schau, wem. Kostenlose Ampel in unter 15 Sekunden für Apps aus Lovable, Cursor, Bolt und Co.">
+  <meta name="twitter:image" content="https://scan.m-ko.de/og.png">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/lang.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main"><span lang="en">Skip to content</span><span lang="de">Zum Inhalt springen</span><span lang="pt">Saltar para o conteúdo</span></a>
+
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="./" aria-label="EDEL.TRAUD.AI">EDEL<i>.</i>TRAUD<i>.</i>AI</a>
+      <div class="lang" role="group" aria-label="Language / Sprache / Idioma">
+        <button type="button" data-set-lang="de" aria-pressed="true" title="Deutsch">DE</button>
+        <button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button>
+        <button type="button" data-set-lang="pt" aria-pressed="false" title="Português">PT</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap">
+        <h1>EDEL.TRAUD.AI</h1>
+        <p class="claim"><span lang="de">Trau, schau, wem.</span><span lang="en">Look before you trust.</span><span lang="pt">Veja em quem confia.</span></p>
+        <p class="hero__intro">
+          <span lang="de">Passiver Schnellcheck für KI-gebaute Web-Apps: Schlüssel im Frontend, Sicherheits-Header, Hinweise auf offene Supabase- oder Firebase-Daten und einiges mehr. Kostenlos, ohne Anmeldung.</span>
+          <span lang="en">Passive quick check for AI-built web apps: keys in the frontend, security headers, hints of open Supabase or Firebase data and more. Free, no sign-up.</span>
+          <span lang="pt">Verificação rápida e passiva para apps web feitas com IA: chaves no frontend, cabeçalhos de segurança, indícios de dados Supabase ou Firebase abertos e mais. Gratuita, sem registo.</span>
+        </p>
+
+        <form id="scan-form" class="scan" novalidate>
+          <label for="url" class="scan__label"><span lang="de">Adresse der App</span><span lang="en">Address of the app</span><span lang="pt">Endereço da app</span></label>
+          <div class="scan__row">
+            <input id="url" name="url" type="text" inputmode="url" autocomplete="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="example.com" aria-describedby="consent" required>
+            <button id="go" class="btn" type="submit"><span lang="de">Prüfen</span><span lang="en">Check</span><span lang="pt">Verificar</span></button>
+          </div>
+          <p id="consent" class="consent">
+            <span lang="de">Nur für eigene Apps oder mit Erlaubnis der Betreiber. Gelesen wird nur, was öffentlich ausgeliefert wird; es wird nichts angegriffen.</span>
+            <span lang="en">Only for your own apps or with the operator's permission. Only publicly delivered content is read; nothing is attacked.</span>
+            <span lang="pt">Apenas para apps próprias ou com a permissão de quem as opera. Só é lido o que é entregue publicamente; nada é atacado.</span>
+          </p>
+        </form>
+
+        <div id="status" class="status" role="status" aria-live="polite" hidden>
+          <p id="status-text"></p>
+          <progress id="status-bar" max="100" value="0" hidden></progress>
+        </div>
+        <div id="error" class="notice" role="alert" hidden></div>
+      </div>
+    </section>
+
+    <section id="result" class="result" aria-live="polite" aria-label="Ergebnis" hidden>
+      <div class="wrap" id="result-body"></div>
+    </section>
+
+    <noscript>
+      <div class="wrap"><p class="notice">
+        <span lang="de">Für den Schnellcheck wird JavaScript benötigt.</span>
+        <span lang="en">The quick check needs JavaScript.</span>
+        <span lang="pt">A verificação rápida precisa de JavaScript.</span>
+      </p></div>
+    </noscript>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <p>
+        <span lang="de">Ein Werkzeug von</span><span lang="en">A tool by</span><span lang="pt">Uma ferramenta de</span>
+        <a href="https://m-ko.de/">m-ko.de</a>
+      </p>
+      <ul>
+        <li><a href="https://m-ko.de/privacy/"><span lang="de">Datenschutz</span><span lang="en">Privacy</span><span lang="pt">Privacidade</span></a></li>
+        <li><a href="https://m-ko.de/imprint/"><span lang="de">Impressum</span><span lang="en">Imprint</span><span lang="pt">Aviso legal</span></a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="assets/app.js" type="module"></script>
+</body>
+</html>

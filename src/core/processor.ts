@@ -4,7 +4,7 @@ import { ArtifactStore, FactStore } from './stores.ts';
 import { dedupe, verdict } from './verdict.ts';
 import { BudgetedHttp, BudgetExceededError } from '../fetch/http.ts';
 import type {
-  CheckModule, Finding, Http, Logger, ModuleManifest, NotChecked, Params, Plan, ScanResult, Target,
+  Browser, CheckModule, Dns, Finding, Http, TlsInspector, Logger, ModuleManifest, NotChecked, Params, Plan, ScanResult, Target,
 } from './types.ts';
 
 export const TOOL_VERSION = '0.1.0';
@@ -14,6 +14,9 @@ export interface RunOptions {
   target: Target;
   registry: ReadonlyMap<string, CheckModule>;
   http: Http;
+  dns?: Dns;
+  tls?: TlsInspector;
+  browser?: Browser;
   log?: Logger;
   /** Keep the request/response log for replay fixtures. */
   record?: boolean;
@@ -101,7 +104,14 @@ export async function runPlan(opts: RunOptions): Promise<RunOutput> {
                     target,
                     artifacts,
                     facts,
-                    ...(m.kind === 'analyzer' ? {} : { http: limitHttp(http, m.budget.requests) }),
+                    ...(m.kind === 'analyzer'
+                      ? {}
+                      : {
+                          http: limitHttp(http, m.budget.requests),
+                          ...(opts.dns ? { dns: opts.dns } : {}),
+                          ...(opts.tls ? { tls: opts.tls } : {}),
+                          ...(opts.browser && m.budget.browser && plan.limits.browser ? { browser: opts.browser } : {}),
+                        }),
                     log,
                     signal: controller.signal,
                   },

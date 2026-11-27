@@ -7,7 +7,7 @@ Stand: 20.11.2026 · Status: Entwurf, Grundlage für das Gerüst
 - Jede Prüfung ist ein **eigenes Modul**, das sich einzeln entwickeln,
   testen, versionieren und verbessern lässt.
 - Ein **Prüfprozessor** arbeitet einen **Prüfplan** ab: eine Liste von
-  Modulen mit Parametern. Ampel, Bericht, Tiefenprüfung und Wache sind nur
+  Modulen mit Parametern. Ampel, Bericht, Tiefenprüfung und WatchDog sind nur
   verschiedene Pläne.
 - **Kostenlos schnell, bezahlt breit und tief**, mit denselben Bausteinen.
 - Der Kern läuft ohne Netz gegen feste Testdaten und ist deterministisch.
@@ -101,12 +101,12 @@ interface Finding {
   messageKey: string;          // 'secrets.openai.title' → DE/EN/PT-Katalog
   vars?: Record<string, string>;
   fix: { stepsKey: string; promptKey?: string };  // Fix-Prompt nur im Bericht
-  fingerprint: string;         // stabil über Läufe, für Wache und Nachprüfung
+  fingerprint: string;         // stabil über Läufe, für WatchDog und Nachprüfung
 }
 ```
 
 `fingerprint` (Hash aus Modul, Befund-Art und normalisierter Fundstelle)
-erlaubt der Wache, nur **neue** Befunde zu melden, und der Nachprüfung,
+erlaubt dem WatchDog, nur **neue** Befunde zu melden, und der Nachprüfung,
 behobene Befunde abzuhaken.
 
 ## 5. Prüfplan und Prüfprozessor
@@ -171,7 +171,7 @@ und im Ergebnis vermerkt. Neue Kombinationen (z. B. "nur Datenschutz",
 5. **Zusammenführen:** Befunde deduplizieren (gleicher `fingerprint`),
    Schwere und Gesamtampel berechnen, Liste "Nicht geprüft" erzeugen.
 6. **Ausgabe:** Ein `ScanResult`-JSON. Alles Weitere (Ampel-Ansicht,
-   HTML, PDF, Mail der Wache) entsteht daraus in `report/`.
+   HTML, PDF, Mail des WatchDog) entsteht daraus in `report/`.
 
 Die Ampel ist eine eigene, kleine Regel auf den Befunden: rot ab einem
 kritischen oder zwei hohen Befunden, gelb ab einem hohen oder drei mittleren,
@@ -196,7 +196,7 @@ src/
     probe/     supabase, firebase, paths, cors, ratelimit, auth
   fetch/       SafeHttp, SafeBrowser (Playwright), SSRF-Schutz, Aufzeichnung
   i18n/        de.json, en.json, pt.json (Titel, Erklärung, Schritte, Fix-Prompts)
-  report/      ampel, html, pdf, diff (Wache, Nachprüfung)
+  report/      ampel, html, pdf, diff (WatchDog, Nachprüfung)
   cli/         edeltraud <url> --plan ampel --json
   api/         HTTP-Dienst: Scan starten, Status, Ergebnis, Inhaberschaft
 plans/         ampel.yaml, report.yaml, deep.yaml, watch.yaml
@@ -276,3 +276,43 @@ Umgesetzt wie oben beschrieben, mit diesen Präzisierungen:
   HTTP-Proxy (`NODE_USE_ENV_PROXY=1`) wird zusätzlich vorab aufgelöst.
 - **Aufzeichnen:** `--record <datei>` speichert alle Antworten eines Laufs
   als Replay-Fixture.
+
+### Welle 2, Teil "Rest" (20.11.2026)
+
+- **DNS und TLS im Kontext:** Sammler und Proben bekommen neben `ctx.http`
+  auch `ctx.dns` (`Dns`, live `LiveDns` über `node:dns/promises`) und
+  `ctx.tls` (`TlsInspector`, live `LiveTls` mit `safeLookup`, also mit
+  demselben SSRF-Schutz). Analysen bekommen beides nicht.
+- **Replay:** `ReplayDns` (Schlüssel `'name TYPE'`) und `ReplayTls`
+  (Host → Handshake). Ein Lauf mit aufgezeichnetem HTTP nutzt nie Live-DNS
+  oder -TLS. Fehlen DNS/TLS, melden die Sammler `unsupported`; das macht den
+  Lauf nicht unvollständig.
+- **Deterministische Ablaufwarnung:** `collect.tls` speichert `checkedAt`,
+  `tls.basics` rechnet die Restlaufzeit daraus. Schwelle: min(14 Tage,
+  20 % der Laufzeit), damit kurzlebige Zertifikate (6 oder 45 Tage) nicht
+  alarmieren.
+- **Fehlerseiten:** `collect.errorpages` fragt feste Pfade ab, damit
+  Aufzeichnungen stabil bleiben. Das ist ein normaler GET auf eine fehlende
+  Seite, also passiv.
+- **Analysen mit optionalen Sammlern** (`dns.mail`, `deps.vulnerable`,
+  `errors.verbose`) deklarieren ihre Eingaben über `uses`, nicht
+  `requires`. Fehlt die Eingabe, bleiben sie still; den Grund meldet der
+  Sammler.
+
+### Welle 2, Teil "Browser" (20.11.2026)
+
+- **`ctx.browser`** gibt es nur für Module mit `budget.browser` in Plänen
+  mit `limits.browser: true`. `LiveBrowser` lädt Playwright erst bei Bedarf
+  (`playwright-core` oder `playwright`, `EDELTRAUD_PLAYWRIGHT`), API-Image
+  und CI brauchen es nicht.
+- **Ein Lauf, keine Interaktion:** frischer Browser je Scan, kein Klick,
+  keine Eingabe. Alles im Artefakt `render` geschah also vor einer
+  möglichen Einwilligung. Vom Storage werden nur Schlüssel gespeichert.
+- **SSRF im Browser:** Jede Anfrage läuft durch `page.route` und wird nach
+  DNS-Auflösung geprüft. Restrisiko DNS-Rebinding (Chromium löst selbst
+  auf): Der Worker (`Dockerfile.worker`) läuft in einem Netz ohne Zugang zu
+  internen Diensten und Metadaten-Endpunkten.
+- **Ampel ohne Browser:** Module, die auch in der Ampel laufen
+  (`privacy.third-party`, `privacy.legal-pages`), arbeiten auf dem
+  statischen HTML. Bei einer leeren SPA-Hülle melden sie "nicht
+  unterstützt" statt zu raten.

@@ -56,6 +56,7 @@ test('vulnerable site, report plan: all expected findings', async () => {
     'sourcemaps.exposed/exposed',
     'supabase.config/detected',
     'tls.basics/no-redirect',
+    'wellknown.securitytxt/securitytxt-missing',
   ]);
   assert.equal(result.verdict.light, 'red');
   // Evidence is masked, never the full key

@@ -4,7 +4,9 @@ import { runOn } from './helpers.ts';
 import { boltFirebase, nextjsVercel, cursorPlainHttp, hardenedLovable, truncatedBigApp } from './fixtures/apps.ts';
 import { FAKE } from './fixtures/sites.ts';
 
-const ids = (r: { findings: { id: string }[] }) => r.findings.map((f) => f.id).sort();
+// The report plan adds an info note for a missing security.txt to every fixture app; it has its own test below.
+const SECURITYTXT = 'wellknown.securitytxt/securitytxt-missing';
+const ids = (r: { findings: { id: string }[] }) => r.findings.map((f) => f.id).filter((id) => id !== SECURITYTXT).sort();
 const RAW = [FAKE.openai, FAKE.anthropic, FAKE.stripeLive, FAKE.github, FAKE.serviceRole, FAKE.googleGemini, FAKE.googleFirebase];
 const stack = (r: { facts: Record<string, unknown> }) => r.facts['stack'] as string[];
 
@@ -106,4 +108,13 @@ test('truncatedBigApp (report): all 12 scripts loaded, no budget entry', async (
   assert.deepEqual(ids(result), ['secrets.frontend/anthropic-key', 'secrets.frontend/openai-key']);
   assert.equal(result.verdict.light, 'red');
   noRawKeys(result);
+});
+
+test('report plan: fixture apps without security.txt get the info note, the ampel does not', async () => {
+  for (const [site, url] of [[boltFirebase(), 'https://recipes.example.com/'], [hardenedLovable(), 'https://secure.example.com/']] as const) {
+    const report = await runOn(site, url, 'report');
+    assert.ok(report.result.findings.some((f) => f.id === SECURITYTXT && f.severity === 'info'));
+    const ampel = await runOn(site, url, 'ampel');
+    assert.ok(!ampel.result.findings.some((f) => f.id === SECURITYTXT));
+  }
 });

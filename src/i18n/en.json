@@ -20,7 +20,102 @@
     "always": "Never checked: server-side logic, permissions of signed-in users, anything behind the login.",
     "disclaimer": "A result without findings only means these checks found nothing. It is not a certificate and not a guarantee.",
     "cta.report": "Full report with steps to fix and ready-made prompts",
-    "cta.human": "Everything behind the login needs a human: production check from €890"
+    "cta.human": "Everything behind the login needs a human: production check from €890",
+    "report.title": "Scan report",
+    "report.skip": "Skip to content",
+    "report.target": "Scanned address",
+    "report.date": "Date",
+    "report.plan": "Scope",
+    "report.duration": "Duration",
+    "report.seconds": "{n} s",
+    "report.verdict": "Overall result",
+    "report.counts": "Findings",
+    "report.stack": "Detected stack",
+    "report.incomplete": "Not everything could be checked. A result without findings therefore says less.",
+    "report.summary": "Overview",
+    "report.col.severity": "Severity",
+    "report.col.finding": "Finding",
+    "report.findings": "Findings in detail",
+    "report.none": "These checks found nothing.",
+    "report.location": "Location",
+    "report.evidence": "Evidence",
+    "report.explain": "What this means",
+    "report.fix": "How to fix",
+    "report.line": "Line",
+    "report.selector": "Element",
+    "report.prompt.title": "Prompt for the AI tool",
+    "report.prompt.copy": "Copy prompt",
+    "report.prompt.copied": "Copied",
+    "report.prompt.hint": "To paste into Lovable, Cursor, Claude Code or a similar tool.",
+    "report.locked": "More findings",
+    "report.always": "Limits of this check",
+    "report.disclaimer": "Important note",
+    "report.footer": "EDEL.TRAUD.AI – a product of m-ko.de",
+    "confidence.confirmed": "confirmed",
+    "confidence.likely": "likely",
+    "confidence.possible": "possible",
+    "plan.ampel": "Traffic light (free)",
+    "plan.report": "Report",
+    "plan.deep": "Deep check",
+    "plan.watch": "WatchDog",
+    "watch.subject": "EDEL.TRAUD.AI: {parts} at {host}",
+    "watch.subject.welcome": "EDEL.TRAUD.AI: WatchDog is active for {host}",
+    "watch.part.new.one": "{n} new finding",
+    "watch.part.new.many": "{n} new findings",
+    "watch.part.fixed.one": "{n} finding fixed",
+    "watch.part.fixed.many": "{n} findings fixed",
+    "watch.part.changed.one": "{n} finding with changed severity",
+    "watch.part.changed.many": "{n} findings with changed severity",
+    "watch.intro": "WatchDog checked {host} on {date}.",
+    "watch.intro.welcome": "WatchDog is set up for {host}. First run: {date}.",
+    "watch.light": "Traffic light",
+    "watch.light.red": "Red",
+    "watch.light.yellow": "Yellow",
+    "watch.light.green": "Green",
+    "watch.light.unknown": "Unknown",
+    "watch.light.none": "not checked before",
+    "watch.section.new": "New",
+    "watch.section.changed": "Severity changed",
+    "watch.section.fixed": "Fixed",
+    "watch.fix": "How to fix",
+    "watch.where": "Location",
+    "watch.severity.from": "from {from} to {to}",
+    "watch.incomplete": "This run could not check everything; fixed findings are only reported on the next complete run.",
+    "watch.report": "View the full report",
+    "watch.footer": "This mail arrives because WatchDog is set up for {host}.",
+    "watch.unsubscribe": "Unsubscribe",
+    "watch.welcome.title": "WatchDog is active",
+    "watch.welcome.counts": "Found on the first run: {counts}.",
+    "watch.welcome.none": "Nothing was found on the first run.",
+    "watch.welcome.next": "Future mails only list what changed since the last run.",
+    "jobs.report.subject": "Report for {host} is ready",
+    "jobs.deep.subject": "Deep check for {host} is ready",
+    "jobs.report.title": "The report for {host} is ready",
+    "jobs.deep.title": "The deep check for {host} is ready",
+    "jobs.summary": "Result: {headline}",
+    "jobs.counts": "Findings: {counts}",
+    "jobs.counts.none": "Findings: none in these checks",
+    "jobs.attached": "The full report is attached as PDF and as HTML file. The HTML file contains the copy buttons for the fix prompts.",
+    "jobs.next.title": "Next steps",
+    "jobs.next.fix": "Work through the findings by severity, starting with critical and high.",
+    "jobs.next.watch": "After that, the WatchDog keeps checking weekly and only reports what changed. Alternatively, a new check confirms the fixes.",
+    "jobs.human": "What automated checks cannot see is covered by the human production check: {url}",
+    "jobs.contact": "Questions or refunds: post@m-ko.de. Refunds are handled through Paddle.",
+    "jobs.ownership.subject": "Prove ownership of {host}",
+    "jobs.ownership.title": "Before the deep check: proof of ownership for {host}",
+    "jobs.ownership.why": "The deep check reads data actively. That is only acceptable for apps that belong to the buyer, so a short proof is needed.",
+    "jobs.ownership.choose": "One of the two options is enough.",
+    "jobs.ownership.dns": "Option 1: DNS TXT record",
+    "jobs.ownership.dnsHint": "A record on the main domain covers all its subdomains.",
+    "jobs.ownership.file": "Option 2: file",
+    "jobs.ownership.fileUrl": "Address: {url}",
+    "jobs.ownership.fileContent": "File content: {content}",
+    "jobs.ownership.link": "Once the proof is in place, this link starts the check: {url}",
+    "jobs.ownership.linkLabel": "Start deep check",
+    "jobs.ownership.valid": "The proof can be set up until {date} (14 days).",
+    "jobs.failure.subject": "About the check of {host}",
+    "jobs.failure.title": "The check of {host} could not be completed automatically",
+    "jobs.failure.body": "This happens occasionally. Markus Kosmal will look at it personally, usually within one working day. No further action is needed."
   },
   "findings": {
     "secrets.server-key": {
@@ -127,6 +222,346 @@
       "title": "LLM SDK explicitly enabled in the browser",
       "explain": "The option dangerouslyAllowBrowser is set. Vendors block browser use by default because it exposes the key.",
       "fix": "Remove the option and move the SDK call to the server."
+    },
+    "tls.cert-expiring": {
+      "title": "Certificate expires soon",
+      "explain": "The certificate is valid for another {days} day(s) (until {date}). Once it expires, browsers show a warning and the app becomes hard to reach.",
+      "fix": "1. Check automatic renewal at the host or Let's Encrypt. 2. Renew the certificate and deploy it."
+    },
+    "tls.legacy-protocol": {
+      "title": "Outdated TLS versions accepted",
+      "explain": "The server still accepts {protocols}. These versions are deprecated and no longer used by current browsers.",
+      "fix": "1. Set the minimum version to TLS 1.2 in the server or hosting configuration. 2. Scan again."
+    },
+    "dns.spf-missing": {
+      "title": "No SPF record for {domain}",
+      "explain": "Without an SPF record, others can send mail in the name of {domain} (spoofing, phishing). Mails the app itself sends, such as sign-in or reset mails, are also more likely to land in spam. For domains without mail, a policy that rejects everything is recommended.",
+      "fix": "1. Add a TXT record on {domain} listing the permitted mail senders, e.g. v=spf1 include:<provider> -all. 2. For a domain that sends no mail: v=spf1 -all."
+    },
+    "dns.spf-multiple": {
+      "title": "Several SPF records for {domain}",
+      "explain": "More than one SPF record on {domain} is invalid; many receivers then ignore SPF entirely, so others can send mail in the domain's name.",
+      "fix": "1. Merge all SPF records into a single TXT record. 2. Keep all permitted senders as include: entries and end with ~all or -all."
+    },
+    "dns.spf-lax": {
+      "title": "SPF policy of {domain} permits any sender ({policy})",
+      "explain": "The SPF record ends with {policy}, so any server counts as permitted. That makes spoofing mails in the name of {domain} easy.",
+      "fix": "1. Replace the ending {policy} with ~all or, better, -all. 2. Check beforehand that all legitimate senders are listed."
+    },
+    "dns.dmarc-missing": {
+      "title": "No DMARC policy for {domain}",
+      "explain": "Without DMARC, receivers do not know what to do with mails that fake {domain} as sender, and nobody gets reports about abuse. For domains without mail, p=reject is recommended.",
+      "fix": "1. Add a TXT record _dmarc.{domain} with v=DMARC1; p=none; rua=mailto:<address> and read the reports. 2. Tighten to p=quarantine, then p=reject. 3. For a domain without mail: v=DMARC1; p=reject."
+    },
+    "dns.dmarc-none": {
+      "title": "DMARC policy of {domain} is only monitoring (p=none)",
+      "explain": "With p=none, receivers deliver forged mails in the name of {domain} anyway. The policy only collects reports.",
+      "fix": "1. Check the DMARC reports for legitimate senders. 2. Tighten the policy to p=quarantine and later p=reject."
+    },
+    "csp.no-script-src": {
+      "title": "CSP does not restrict scripts",
+      "explain": "The Content-Security-Policy has neither script-src nor default-src, so scripts from anywhere may run. Injected code is then not held back.",
+      "fix": "1. Add default-src 'self' or a script-src with the needed sources. 2. Prefer nonces or hashes over broad allowances."
+    },
+    "csp.unsafe-inline": {
+      "title": "CSP allows inline scripts ('unsafe-inline')",
+      "explain": "With 'unsafe-inline' and no nonce or hash, injected script code is executed as well, which removes much of the protection a CSP offers.",
+      "fix": "1. Move inline scripts to files or give them a nonce or hash. 2. Remove 'unsafe-inline' from script-src."
+    },
+    "csp.unsafe-eval": {
+      "title": "CSP allows eval ('unsafe-eval')",
+      "explain": "'unsafe-eval' permits turning strings into code at run time, a common route for injected code.",
+      "fix": "1. Find the libraries or code that need eval. 2. Replace them and remove 'unsafe-eval'."
+    },
+    "csp.wildcard": {
+      "title": "CSP script source {source} is too broad",
+      "explain": "The source {source} in the script policy permits scripts from a very wide range of hosts, including ones the app owner does not control.",
+      "fix": "1. Replace {source} with the exact hosts that are needed. 2. Prefer 'self' plus nonces or hashes."
+    },
+    "csp.object-src": {
+      "title": "CSP does not restrict object-src",
+      "explain": "Neither object-src nor default-src is set, so plugins and embedded objects are not restricted.",
+      "fix": "1. Add object-src 'none'. 2. Alternatively, set a restrictive default-src."
+    },
+    "csp.report-only": {
+      "title": "CSP only runs in report-only mode",
+      "explain": "The header Content-Security-Policy-Report-Only reports violations but blocks nothing.",
+      "fix": "1. Review the reports for false alarms. 2. Then serve the policy as Content-Security-Policy."
+    },
+    "deps.vulnerable": {
+      "title": "{library} {version} has known vulnerabilities",
+      "explain": "The shipped JavaScript contains {library} version {version}. Security advisories exist for this version: {advisories}. Versions are only recognised where they are visible in the bundle, and the list is a curated selection, not exhaustive. A listed advisory does not mean the app uses the affected function.",
+      "fix": "1. Update {library} to version {fixed} or newer. 2. Run npm audit to find further affected dependencies. 3. Rebuild and scan the site again."
+    },
+    "deps.eol": {
+      "title": "{library} {version} is no longer maintained",
+      "explain": "The shipped JavaScript contains {library} version {version}. This major version has received no security updates since {eol}, so newly found vulnerabilities are not fixed. Versions are only recognised where they are visible in the bundle.",
+      "fix": "1. Move to a currently maintained major version or a successor. 2. Run npm audit to check the dependencies. 3. Rebuild and scan the site again."
+    },
+    "build.dev-server": {
+      "title": "Development server ({tool}) publicly reachable",
+      "explain": "The page loads scripts from the {tool} development server. It serves unminified code with source hints and is not meant to run on the internet.",
+      "fix": "1. Serve the app from the production build (build, then host statically or via the start command). 2. Do not run the development server on a public address. 3. Check afterwards that the dev scripts are no longer loaded."
+    },
+    "build.dev-build": {
+      "title": "Development build of {framework} in production",
+      "explain": "The app serves the development variant of {framework}. It is larger and slower and exposes verbose warnings and internal details.",
+      "fix": "1. Create the app with the production build (NODE_ENV=production or the production config). 2. Serve only the generated files. 3. Check that the development hints are gone from the code."
+    },
+    "errors.debug-page": {
+      "title": "{framework} debug page visible",
+      "explain": "On an error the app shows the {framework} debug interface. It can reveal source code, settings and environment variables.",
+      "fix": "1. Turn debug mode off in production. 2. Configure a plain error page without technical details. 3. Rotate any secrets that were visible in the debug output."
+    },
+    "errors.stacktrace": {
+      "title": "Error page shows a stack trace",
+      "explain": "An error page contains technical details such as file paths and function names. This helps targeted attacks and reveals how the app is built.",
+      "fix": "1. Turn off verbose error output in production. 2. Write errors to the server log only. 3. Show users a generic error message."
+    },
+    "errors.sql": {
+      "title": "Error page shows a SQL error message",
+      "explain": "A response contains the database's error message. It reveals tables, queries or the database type and often points to inputs that are not validated properly.",
+      "fix": "1. Catch database errors and record them in the server log only. 2. Show users a generic message. 3. Switch queries to parameters instead of string concatenation."
+    },
+    "errors.framework-page": {
+      "title": "Default error page of {framework}",
+      "explain": "The error page comes unchanged from {framework}. It reveals the technology in use and hints at missing error handling.",
+      "fix": "1. Provide custom error pages for 404 and 500. 2. Show no technical details in them."
+    },
+    "privacy.no-privacy-link": {
+      "title": "No link to a privacy policy found",
+      "explain": "No link was found on the start page whose address or text points to a privacy policy. As soon as an app processes personal data (sign-in, forms, analytics), an easy-to-find policy is usually expected. This is a hint, not a legal assessment.",
+      "fix": "1. Prepare a privacy policy. 2. Link it in the footer of every page, e.g. at /privacy. 3. Check that the link works without signing in."
+    },
+    "privacy.no-imprint-link": {
+      "title": "No imprint link found",
+      "explain": "No link to an imprint (legal notice) was found on the start page. In Germany and Austria an imprint is usually expected for commercial sites; elsewhere it is mostly optional. This is a hint, not a legal assessment.",
+      "fix": "1. Check whether an imprint is customary for this site. 2. If so, create a /imprint page and link it in the footer of every page."
+    },
+    "privacy.legal-unreachable": {
+      "title": "Legal page not reachable: {href}",
+      "explain": "The link {href} (imprint or privacy policy) answers with status {status}. A link that leads nowhere does not help visitors and is easy to notice.",
+      "fix": "1. Check that a page exists at {href} (route, file name, letter case). 2. For single-page apps, make sure the route is served on direct access. 3. Fix the link or the page."
+    },
+    "ops.console-errors": {
+      "title": "{count} errors in the browser console",
+      "explain": "Loading the start page logged {count} error messages or uncaught exceptions. First message: {sample}. Such errors often point to broken features that visitors do not report.",
+      "fix": "1. Load the start page with the developer tools open. 2. Fix the errors one by one. 3. Set up error monitoring."
+    },
+    "ops.failed-requests": {
+      "title": "{count} failed requests from the page to itself",
+      "explain": "While loading the start page, {count} requests to its own domain returned an error or failed. First example: {sample}. These are often missing files or broken API routes.",
+      "fix": "1. Inspect the requests in the network tab of the developer tools. 2. Provide the missing files or remove the references. 3. Check the API routes."
+    },
+    "ops.console-secret": {
+      "title": "Secret key in the browser console",
+      "explain": "On load, the console prints something that looks like a secret key or token (service_role, sk-…, Bearer …). Anyone opening the page can read it.",
+      "fix": "1. Remove the logging at the affected place. 2. Treat the key as compromised and rotate it. 3. Use secrets on the server only."
+    },
+    "mixed.active": {
+      "title": "{count} active resources over http on an https page",
+      "explain": "Scripts, stylesheets, frames or forms are loaded or sent over unencrypted http, e.g. {sample}. Browsers usually block this and the feature breaks; where they do not, third parties can alter the content.",
+      "fix": "1. Switch the addresses to https (e.g. {sample}). 2. If the provider has no https, replace the resource. 3. Optionally set upgrade-insecure-requests in the CSP."
+    },
+    "mixed.passive": {
+      "title": "{count} images or media over http on an https page",
+      "explain": "Images, audio or video are loaded over unencrypted http, e.g. {sample}. Browsers show warnings for this or do not load the content.",
+      "fix": "1. Switch the addresses to https (e.g. {sample}). 2. Host the files yourself if needed."
+    },
+    "sri.missing": {
+      "title": "{count} third-party scripts or stylesheets without integrity check",
+      "explain": "Files are loaded from other servers without an integrity attribute, e.g. {sample}. If the third-party server is compromised or the file is replaced, the altered code runs in the app.",
+      "fix": "1. For pinned CDN files, add an integrity attribute (SRI hash) together with crossorigin=\"anonymous\". 2. Alternatively host the file yourself. 3. Pin the version."
+    },
+    "server.php2shell": {
+      "title": "PHP {version}: version in the PHP2Shell range (may already be patched)",
+      "explain": "The response headers disclose PHP {version}. This version number falls in the range of {advisories} (PHP2Shell, unauthenticated remote code execution, CVSS 9.2). Fixed in PHP 8.5.12, 8.4.27, 8.3.36 and 8.2.35; there is no official fix for 8.1 and older. Linux distributions often backport fixes and keep the old version number (for example Ubuntu 24.04 ships 8.3.6 with the fix). The version number therefore only suggests the vulnerability; the hoster or distribution may have patched it already.",
+      "fix": "1. Run php -v and read the security notice of the distribution or hosting provider to check whether the fix is included. 2. If not, update to PHP {fixed} or newer, or ask the hoster to. 3. Hide the version in the response headers."
+    },
+    "server.php-eol": {
+      "title": "PHP {version} is no longer maintained",
+      "explain": "The response headers disclose PHP {version}. This branch no longer receives security updates, so newly found vulnerabilities are not fixed. Some distributions maintain branches longer, which cannot be seen from outside.",
+      "fix": "1. Move to a currently supported PHP branch (see php.net/supported-versions). 2. With a hoster, switch to a newer PHP version. 3. Test the application and extensions afterwards."
+    },
+    "server.php-eol-soon": {
+      "title": "PHP {version}: security support ends {eol}",
+      "explain": "The response headers disclose PHP {version}. Security support for this branch ends {eol}; after that new vulnerabilities are no longer fixed.",
+      "fix": "1. Plan the move to a newer PHP branch. 2. Check the application and extensions for compatibility. 3. Switch before support ends."
+    },
+    "next.data-secret": {
+      "title": "Secret key in the Next.js page data ({provider})",
+      "explain": "The data Next.js embeds into the HTML page (__NEXT_DATA__ or App Router flight data) contains a secret key or database connection string ({provider}). Every visitor can read this data.",
+      "fix": "1. Revoke and rotate the credential at {provider} right away. 2. Stop returning the value from getServerSideProps/getStaticProps or passing it as a prop to client components. 3. Pass only the fields the page really needs."
+    },
+    "next.data-pii": {
+      "title": "Personal data in the Next.js page data ({count} indicators)",
+      "explain": "The Next.js data embedded in the HTML page contains many e-mail addresses, password fields or admin flags next to user lists (count: {count}). Every visitor can read it. Values are not shown here.",
+      "fix": "1. Check which records are passed to the page. 2. Filter user lists, password hashes and roles on the server and pass only needed fields. 3. Have passwords reset if hashes were exposed."
+    },
+    "next.data-internal": {
+      "title": "Internal addresses in the Next.js page data ({count})",
+      "explain": "The embedded Next.js data refers to internal addresses (localhost, private networks or .internal names, count: {count}). This reveals infrastructure layout and hints at development configuration.",
+      "fix": "1. Remove internal URLs from the data passed to the page. 2. Review production environment variables. 3. Give the browser only publicly reachable addresses."
+    },
+    "ai.system-prompt-exposed": {
+      "title": "System prompt readable in the shipped code ({count})",
+      "explain": "The page's JavaScript contains at least one system prompt in plain text, starting with \"{sample}\" (count: {count}). Every visitor can read it. If it contains business rules, internal notes or credentials, these are disclosed.",
+      "fix": "1. Move the prompt and the AI call to a server or edge function. 2. Never put secrets or internal rules in prompts. 3. Rebuild and verify the text is gone from the bundle."
+    },
+    "privacy.third-party": {
+      "title": "{count} external services are loaded",
+      "explain": "Loading the page fetches content or scripts from third-party servers: {list}. At least the IP address and browser data go to these providers. The list is a hint based on a curated selection and is not exhaustive.",
+      "fix": "1. Check which of the listed services are really needed. 2. Remove integrations that are not. 3. Name the rest in the privacy policy and self-host where possible."
+    },
+    "privacy.third-country": {
+      "title": "Services with a seat outside the EU/EEA/Switzerland",
+      "explain": "At least one recognised service belongs to a company seated outside the EU, EEA and Switzerland: {list}. Data may therefore be transferred to third countries. This is a hint, not a legal assessment.",
+      "fix": "1. Check whether the services are needed and whether an EU region or EU provider is available. 2. Describe the transfer in the privacy policy."
+    },
+    "privacy.google-fonts": {
+      "title": "Fonts are loaded from Google servers",
+      "explain": "The page loads fonts from {host}. The visitor's IP address is sent to Google (USA) on every request, before any consent is possible.",
+      "fix": "1. Download the fonts needed (e.g. via fontsource or google-webfonts-helper). 2. Ship them as files with the app and include them with @font-face. 3. Remove the links to fonts.googleapis.com and fonts.gstatic.com."
+    },
+    "privacy.tracking-before-consent": {
+      "title": "Tracking services are loaded before consent",
+      "explain": "When the page loads, without any click on a banner, requests go to tracking services: {list}. Consent tool detected: {cmp}. Data goes to these providers before consent is possible.",
+      "fix": "1. Load tracking scripts only after consent. 2. Use a consent tool that really blocks scripts. 3. Alternatively switch to services without cookies and profiling."
+    },
+    "privacy.consent-mode-denied": {
+      "title": "Google Consent Mode: requests still reach Google despite denial",
+      "explain": "Requests to {list} carry the status \"denied\" (gcs=G100) and no tracking cookies were set. Cookieless pings still reach Google before consent is given. Consent tool detected: {cmp}.",
+      "fix": "1. Check whether the cookieless pings are intended and described in the privacy policy. 2. Otherwise load Google scripts only after consent."
+    },
+    "privacy.cookies-before-consent": {
+      "title": "Tracking cookies are set without consent",
+      "explain": "After the page loads, without any interaction, cookies that typically belong to tracking exist: {list}. Consent tool detected: {cmp}.",
+      "fix": "1. Load the scripts that set them only after consent. 2. Delete existing cookies when consent is declined. 3. Re-check with cleared cookies."
+    },
+    "supabase.autoconfirm": {
+      "title": "Supabase: sign-up is open and email confirmation is off",
+      "explain": "The public auth settings of the Supabase project allow sign-ups and confirm new accounts automatically, without checking the email address. Anyone can create a confirmed account with any address, including other people's. If table policies say \"any signed-in user may read everything\", the data is effectively public.",
+      "fix": "1. In Supabase under Authentication, Providers, Email, turn on \"Confirm email\". 2. Review policies that only check \"authenticated\" and switch them to auth.uid() = user_id or roles. 3. If self-registration is not wanted, disable sign-ups."
+    },
+    "supabase.phone-autoconfirm": {
+      "title": "Supabase: phone numbers are accepted without confirmation",
+      "explain": "With open sign-up, accounts using phone numbers are confirmed automatically. No code is checked, so any number can be entered. This makes abuse and fake accounts easier.",
+      "fix": "1. In Supabase under Authentication, Providers, Phone, turn on confirmation by SMS code. 2. If phone sign-in is not needed, disable the provider."
+    },
+    "supabase.table-readable": {
+      "title": "Table \"{table}\" is readable without signing in",
+      "explain": "The public Supabase key from the frontend was enough to read the table \"{table}\" (columns: {columns}, rows: {rows}). Exactly one row was requested to prove access; no data was kept, and the report only shows column names. Missing Row Level Security is the most frequent serious flaw in AI-built apps: anyone with the project URL can then fetch the data.",
+      "fix": "1. In Supabase, enable Row Level Security for the table (ALTER TABLE ... ENABLE ROW LEVEL SECURITY). 2. Add policies, e.g. USING (auth.uid() = user_id). 3. Revoke the SELECT privilege from the anon role where it is not needed. 4. Query again with the anon key and check that no rows come back."
+    },
+    "supabase.rpc-exposed": {
+      "title": "Supabase: {count} functions callable with the public key",
+      "explain": "The project's API schema lists database functions (RPC) that can be called with the public key: {list}. The functions were not executed. Functions often run with elevated rights; names like admin, delete or set point to actions that are not meant for anonymous visitors.",
+      "fix": "1. Revoke execute permission from the anon and public roles (REVOKE EXECUTE ON FUNCTION ... FROM anon, public). 2. Check auth.uid() and the role inside the functions. 3. Limit functions with elevated rights (SECURITY DEFINER) to the minimum or move them to a non-exposed schema."
+    },
+    "supabase.storage-public": {
+      "title": "Supabase: storage bucket \"{bucket}\" is public",
+      "explain": "The bucket \"{bucket}\" is marked public. Files in it can be fetched by anyone who knows the path. That is intended for images and downloads, but not for private files such as invoices or user uploads.",
+      "fix": "1. Check that the bucket only holds files meant to be public. 2. Move private files to a non-public bucket and serve them with signed URLs. 3. Review the storage policies for write and delete access."
+    },
+    "firebase.rtdb-open": {
+      "title": "Firebase: Realtime Database readable without sign-in",
+      "explain": "The project's Realtime Database answers requests without sign-in. As proof, only a \"shallow\" query was made, which returns just the top-level key names ({keys} keys, e.g. {sample}). No values were read or stored. The usual cause is Firebase Security Rules such as \".read\": true, or test mode, which is meant to lock after its deadline but is often extended. Anyone who knows the database URL (it is in the browser code) can read all data, and with \".write\": true also change or delete it.",
+      "fix": "1. In the Firebase Console under Realtime Database, Rules, stop setting \".read\" and \".write\" to true. 2. Tie access to sign-in, e.g. \"auth != null\", and restrict per user, e.g. \"auth.uid === $uid\". 3. Test the rules in the simulator while signed out, then scan again."
+    },
+    "firebase.firestore-open": {
+      "title": "Firebase: Firestore collection \"{collection}\" readable without sign-in",
+      "explain": "The Firestore collection \"{collection}\" returned a document with the app's public API key and no sign-in. As proof, exactly one document was requested; only the field names ({fields}) were kept, no values. Typical causes are Firebase Security Rules such as \"allow read, write: if true\" or test mode with an extended deadline. If the fields hold personal data, this is a serious data protection incident.",
+      "fix": "1. In the Firebase Console under Firestore, Rules, remove \"allow read, write: if true\". 2. Start from \"request.auth != null\" and check per document, e.g. \"request.auth.uid == resource.data.userId\". 3. Lock collections that are not needed from the client and test the rules in the Rules Playground. 4. Scan again."
+    },
+    "firebase.storage-listable": {
+      "title": "Firebase: file list of storage bucket \"{bucket}\" available without sign-in",
+      "explain": "The Cloud Storage bucket \"{bucket}\" returns its file list without sign-in. As proof, only a single entry was requested; neither file name nor content was stored. The usual cause is Storage rules such as \"allow read: if true\" or test mode. With the list, all uploaded files can be found and downloaded.",
+      "fix": "1. In the Firebase Console under Storage, Rules, remove \"allow read: if true\". 2. Bind reading and writing to \"request.auth != null\" and separate paths per user, e.g. \"request.auth.uid == userId\" for \"users/{userId}/...\". 3. Release files that must stay public explicitly under a dedicated path. 4. Scan again."
+    },
+    "paths.env-exposed": {
+      "title": "Configuration file {path} publicly readable",
+      "explain": "The file {path} can be fetched without logging in. It holds settings with these names: {keys}. The values were not stored. Such files usually contain credentials, and anyone who knows the URL can read them.",
+      "fix": "1. Remove the file from the public directory or the build right away. 2. Treat all keys and passwords in it as compromised and issue new ones. 3. Configure the server so that dot-files are never served."
+    },
+    "paths.git-exposed": {
+      "title": "Version control data ({path}) publicly readable",
+      "explain": "The file {path} can be fetched. This often allows the whole source code and its history to be reconstructed, including credentials that were removed earlier.",
+      "fix": "1. Remove the .git or .svn folder from the public directory. 2. Add a web server rule that blocks these paths. 3. Rotate any keys contained in the history."
+    },
+    "paths.backup-exposed": {
+      "title": "Backup or dump file {path} reachable",
+      "explain": "A downloadable file exists at {path} (size: {size} bytes). Backups and database dumps often contain customer data and credentials. The content was not downloaded.",
+      "fix": "1. Remove the file from the public directory. 2. Rotate included credentials and check the access log for earlier downloads. 3. Keep backups outside the web root or in protected storage."
+    },
+    "paths.info-exposed": {
+      "title": "Internal file or status page {path} reachable",
+      "explain": "The path {path} returns configuration or diagnostic information (for example server status, PHP info, editor or container settings). This eases targeted attacks and reveals structure and versions.",
+      "fix": "1. Remove the file or page from the public directory or protect it with access control. 2. Make diagnostic pages reachable only internally or after login. 3. Adjust the build so development files are not published."
+    },
+    "paths.admin-open": {
+      "title": "Admin area {path} reachable without a login form",
+      "explain": "The path {path} answers with a page that looks like a dashboard and has no password field. This may indicate an unprotected admin area; it is an observation, not proof.",
+      "fix": "1. Check whether the page offers real functions or data without login. 2. Restrict access on the server to signed-in administrators. 3. Consider an additional IP restriction or second factor for the admin area."
+    },
+    "dns.dangling": {
+      "title": "Dangling DNS record: {host} points to {target}",
+      "explain": "{host} is a CNAME to {target}, but that target returns no address. The service was probably deleted. Someone else could then register the same name there and serve content under {host} (subdomain takeover), such as phishing pages or cookie theft.",
+      "fix": "1. Remove the CNAME record for {host} from DNS if it is no longer needed. 2. Otherwise re-create the service at {target} and attach the domain again. 3. Review DNS records regularly for targets that no longer exist."
+    },
+    "wellknown.securitytxt-missing": {
+      "title": "No security.txt found",
+      "explain": "No contact point for security reports is published at /.well-known/security.txt. Anyone who finds a vulnerability does not know where to report it.",
+      "fix": "1. Create /.well-known/security.txt (RFC 9116). 2. Add at least Contact: and Expires:. 3. Make sure the file is served as plain text, not HTML."
+    },
+    "wellknown.securitytxt-expired": {
+      "title": "security.txt has expired",
+      "explain": "The Expires field of security.txt is in the past ({date}). Under RFC 9116, expired information is no longer considered reliable.",
+      "fix": "1. Check the contact details. 2. Set Expires to a date within one year. 3. Put the renewal into a calendar or the deployment process."
+    },
+    "wellknown.securitytxt-incomplete": {
+      "title": "security.txt without a valid Expires",
+      "explain": "The security.txt has no (readable) Expires field. RFC 9116 requires Contact and Expires.",
+      "fix": "1. Add a line Expires: with a date like 2027-06-01T00:00:00Z. 2. Reload the file and check it."
+    },
+    "wellknown.robots-sensitive": {
+      "title": "robots.txt lists sensitive-looking paths",
+      "explain": "The public robots.txt has {count} Disallow entries that look like internal areas (e.g. {sample}). robots.txt is readable by everyone and no protection: Disallow is not access control, it is a hint to search engines and also shows where something is.",
+      "fix": "1. Make sure these areas are protected by login or network rules. 2. Remove paths that should not be advertised from robots.txt and use noindex or access protection instead."
+    },
+    "wellknown.robots-blocks-all": {
+      "title": "Site blocked for search engines",
+      "explain": "The start page is blocked for search engines via {sources} (Disallow: / or noindex). It will not appear in search results. This may be intended, e.g. for test or preview versions.",
+      "fix": "1. Check whether the block is intended for the production site. 2. If not, remove Disallow: / or noindex."
+    },
+    "deps.generator-outdated": {
+      "title": "Generator version may be outdated",
+      "explain": "The generator tag names {name} {version}. According to a small internal table (as of {date}, to be verified), {advisory} affects versions below {min}. Whether the affected setup is actually in use cannot be seen from the outside.",
+      "fix": "1. Check the advisory at the vendor. 2. Update to {min} or newer and redeploy. 3. Optionally remove the generator tag."
+    },
+    "api.unauth-data": {
+      "title": "API endpoint {path} returns data without login",
+      "explain": "An anonymous GET request (no cookies, no credentials) to {path} returned JSON data: {count} entries, fields {fields}. Only the count and field names were stored, no values. If the data is not meant to be public, anyone with the address can read it.",
+      "fix": "1. Decide whether the endpoint is meant to be public. 2. If not: check authentication on the server and limit access to the caller's own records. 3. Return only the fields that are needed. 4. Call it again without login and confirm it answers 401 or 403."
+    },
+    "auth.client-only": {
+      "title": "Access control for admin areas seems to live only in the browser",
+      "explain": "The front-end code contains admin routes ({routes}) together with role checks such as role === \"admin\", but no endpoints under /api/admin and no Edge Functions with \"admin\" in the name. This is a hint, not proof. Hiding UI does not protect data: anyone calling the endpoints directly bypasses every check in the browser. Rights must be enforced on the server or in the database (Row Level Security).",
+      "fix": "1. Check that admin actions verify the role on the server. 2. In Supabase, use Row Level Security with role checks based on app_metadata or a roles table, not user_metadata (which users can change). 3. Run admin endpoints only after a server-side role check. 4. Test as a normal user that admin calls are rejected."
+    },
+    "cors.reflect-credentials": {
+      "title": "CORS reflects any origin and allows credentials ({path})",
+      "explain": "The response from {path} echoed the origin of a foreign, made-up domain in Access-Control-Allow-Origin and also allowed credentials (Access-Control-Allow-Credentials: true). Other websites can then read responses of this endpoint on behalf of signed-in users.",
+      "fix": "1. Restrict allowed origins to a fixed list of own domains; never echo the Origin request header unchecked. 2. Send Allow-Credentials only for that list. 3. Test again with a foreign origin and confirm no Allow-Origin header comes back."
+    },
+    "cors.wildcard-credentials": {
+      "title": "CORS combines wildcard origin with credentials ({path})",
+      "explain": "The response from {path} contains Access-Control-Allow-Origin: * together with Access-Control-Allow-Credentials: true. Browsers refuse this combination, but it shows a broken CORS configuration that easily turns into reflecting any origin when someone \"fixes\" it later.",
+      "fix": "1. Decide whether the endpoint needs credentials. 2. If yes: use a fixed list of own origins instead of *. 3. If no: remove Allow-Credentials."
+    },
+    "cors.reflect": {
+      "title": "CORS reflects any origin ({path})",
+      "explain": "The response from {path} echoed the origin of a foreign, made-up domain in Access-Control-Allow-Origin without allowing credentials. For public data this is often intended; for non-public data the list of allowed origins should be limited.",
+      "fix": "1. Check whether the endpoint should be readable from any website. 2. If not: use a fixed list of own origins. 3. Test again with a foreign origin."
     }
   }
 }

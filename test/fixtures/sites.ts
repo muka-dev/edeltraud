@@ -69,6 +69,11 @@ const stripe=Stripe("${FAKE.stripePub}");`;
       body: html,
     },
     'http://clean.example.com/': { redirect: 'https://clean.example.com/' },
+    // A well-kept app publishes a security contact (RFC 9116).
+    'https://clean.example.com/.well-known/security.txt': {
+      headers: { 'content-type': 'text/plain' },
+      body: 'Contact: mailto:security@clean.example.com\nExpires: 2099-12-31T23:00:00.000Z\n',
+    },
     'https://clean.example.com/assets/index-Q1w2e3r4.js': { body: index },
   };
 }
