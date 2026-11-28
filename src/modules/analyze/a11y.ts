@@ -25,7 +25,8 @@ export function cleanHtml(html: string): string {
     prev = html;
     html = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<(script|style|template|noscript)\b[\s\S]*?<\/\1>/gi, ' ');
   } while (html !== prev);
-  return html;
+  // An unterminated comment runs to the end of the document, as in browsers.
+  return html.replace(/<!--[\s\S]*$/, '');
 }
 
 /** Visible text of a fragment. */
