@@ -18,8 +18,14 @@ export function attrsOf(tag: string): Record<string, string> {
 }
 
 /** Removes comments, scripts, styles and templates: their content is not part of the page. */
+// Repeated until nothing changes, so removing one part cannot leave a new one behind (e.g. '<!<!---->--').
 export function cleanHtml(html: string): string {
-  return html.replace(/<!--[\s\S]*?-->/g, '').replace(/<(script|style|template|noscript)\b[\s\S]*?<\/\1>/gi, ' ');
+  let prev: string;
+  do {
+    prev = html;
+    html = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<(script|style|template|noscript)\b[\s\S]*?<\/\1>/gi, ' ');
+  } while (html !== prev);
+  return html;
 }
 
 /** Visible text of a fragment. */
