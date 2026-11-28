@@ -1,5 +1,5 @@
 # API for the free quick check (no browser). Paid plans with a browser run in Dockerfile.worker.
-FROM node:22-slim
+FROM node:26-slim
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
