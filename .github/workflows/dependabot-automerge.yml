@@ -1,29 +1,47 @@
-# Dependabot: patch and minor updates (and all GitHub Actions updates) merge on their own
-# once every required check is green. Major updates only get the label "major-update".
-# Needs: Settings > General > "Allow auto-merge" and a branch rule for main with required checks.
+# Dependabot without GitHub's auto-merge setting (not available for private repos on the Free plan).
+# 1. On each Dependabot PR: patch, minor and GitHub Actions updates get the label "automerge",
+#    major updates the label "major-update" (merged by hand).
+# 2. When the CI workflow finishes green on such a PR, this workflow merges it.
 name: Dependabot auto-merge
-on: pull_request
+on:
+  pull_request:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
 permissions:
   contents: write
   pull-requests: write
 jobs:
-  automerge:
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+  label:
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - id: meta
         uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a  # v2.5.0
-      - name: Enable auto-merge (patch, minor, GitHub Actions)
-        if: steps.meta.outputs.update-type != 'version-update:semver-major' || steps.meta.outputs.package-ecosystem == 'github_actions'
-        run: gh pr merge --auto --merge "$PR_URL"
+      - name: Label
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Label major update
-        if: steps.meta.outputs.update-type == 'version-update:semver-major' && steps.meta.outputs.package-ecosystem != 'github_actions'
+          MAJOR: ${{ steps.meta.outputs.update-type == 'version-update:semver-major' && steps.meta.outputs.package-ecosystem != 'github_actions' }}
         run: |
-          gh label create major-update --color B60205 --description "Major update, review by hand" --force -R "$GITHUB_REPOSITORY"
-          gh pr edit "$PR_URL" --add-label major-update
+          if [ "$MAJOR" = "true" ]; then l=major-update; c=B60205; d="Major update, review by hand"; else l=automerge; c=0E8A16; d="Merged after green CI"; fi
+          gh label create "$l" --color "$c" --description "$d" --force -R "$GITHUB_REPOSITORY"
+          gh pr edit "$PR_URL" --add-label "$l"
+  merge:
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]' &&
+      github.event.workflow_run.pull_requests[0] != null
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge if labelled automerge and head unchanged
         env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.workflow_run.pull_requests[0].number }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          labels=$(gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name')
+          echo "$labels" | grep -qx automerge || { echo "not labelled automerge"; exit 0; }
+          gh pr merge "$PR" -R "$GITHUB_REPOSITORY" --merge --match-head-commit "$SHA"

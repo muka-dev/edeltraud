@@ -88,7 +88,7 @@ test('errors: stack traces, masked', async () => {
   const r = await scan({ ...page('ok'), [P1]: { status: 500, body: node }, [P2]: { status: 500, body: 'Traceback (most recent call last):\n  File "x.py"' } });
   const st = r.findings.filter((x) => x.id === 'errors.verbose/stacktrace');
   assert.equal(st.length, 2);
-  for (const f of st) assert.ok((f.evidence ?? '').length <= 80 && !f.evidence!.includes('alice'), f.evidence);
+  for (const f of st) assert.ok((f.evidence ?? '').length <= 80 && !f.evidence!.includes('alice'), f.evidence ?? '');
   assert.ok(st.find((f) => f.location.url === P1)!.evidence!.includes('…'));
 
   const one = await scan({ ...page('ok'), [P1]: { body: 'at handler (/home/alice/app/server.js:12:34)' } });
