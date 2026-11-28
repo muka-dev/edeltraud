@@ -1,0 +1,29 @@
+# Dependabot: patch and minor updates (and all GitHub Actions updates) merge on their own
+# once every required check is green. Major updates only get the label "major-update".
+# Needs: Settings > General > "Allow auto-merge" and a branch rule for main with required checks.
+name: Dependabot auto-merge
+on: pull_request
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  automerge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - id: meta
+        uses: dependabot/fetch-metadata@v2
+      - name: Enable auto-merge (patch, minor, GitHub Actions)
+        if: steps.meta.outputs.update-type != 'version-update:semver-major' || steps.meta.outputs.package-ecosystem == 'github_actions'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Label major update
+        if: steps.meta.outputs.update-type == 'version-update:semver-major' && steps.meta.outputs.package-ecosystem != 'github_actions'
+        run: |
+          gh label create major-update --color B60205 --description "Major update, review by hand" --force -R "$GITHUB_REPOSITORY"
+          gh pr edit "$PR_URL" --add-label major-update
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
