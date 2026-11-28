@@ -18,15 +18,18 @@ export function attrsOf(tag: string): Record<string, string> {
 }
 
 /** Removes comments, scripts, styles and templates: their content is not part of the page. */
-// Repeated until nothing changes, so removing one part cannot leave a new one behind (e.g. '<!<!---->--').
 export function cleanHtml(html: string): string {
-  let prev: string;
-  do {
-    prev = html;
-    html = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<(script|style|template|noscript)\b[\s\S]*?<\/\1>/gi, ' ');
-  } while (html !== prev);
-  // An unterminated comment runs to the end of the document, as in browsers.
-  return html.replace(/<!--[\s\S]*$/, '');
+  // Comments by index, each replaced by a space so no new '<!--' can form; an unterminated one runs to the end.
+  let out = '';
+  for (let i = 0; ; ) {
+    const start = html.indexOf('<!--', i);
+    if (start < 0) { out += html.slice(i); break; }
+    out += html.slice(i, start) + ' ';
+    const end = html.indexOf('-->', start + 4);
+    if (end < 0) break;
+    i = end + 3;
+  }
+  return out.replace(/<(script|style|template|noscript)\b[\s\S]*?<\/\1>/gi, ' ');
 }
 
 /** Visible text of a fragment. */
