@@ -11,6 +11,10 @@ function getRender(ctx: ModuleContext): RenderData | undefined {
 function getPage(ctx: ModuleContext): PageData | undefined {
   return ctx.artifacts.list('page')[0]?.data as PageData | undefined;
 }
+/** Static resource URLs of the pages collect.crawl loaded (not rendered). */
+function subpageUrls(ctx: ModuleContext): string[] {
+  return ctx.artifacts.list('subpage').flatMap((a) => staticUrls((a.data as PageData).html, (a.data as PageData).finalUrl));
+}
 
 /** True if the body has (almost) no content: a JS app shell that needs rendering to show anything. */
 export function isSpaShell(html: string): boolean {
@@ -75,7 +79,7 @@ export const privacyThirdParty: CheckModule = {
     mode: 'passive',
     category: 'privacy',
     requires: [],
-    uses: ['artifact:render', 'artifact:page'],
+    uses: ['artifact:render', 'artifact:page', 'artifact:subpage'],
     provides: ['fact:privacy.thirdParties'],
     params: {},
     budget: {},
@@ -89,7 +93,7 @@ export const privacyThirdParty: CheckModule = {
       return { notChecked: [{ module: m.id, reason: 'unsupported', detail: 'needs rendering' }] };
     }
     const pageHost = pageHostOf(ctx, page, render);
-    const urls = render ? render.requests.map((r) => r.url) : staticUrls(page!.html, page!.finalUrl);
+    const urls = [...(render ? render.requests.map((r) => r.url) : staticUrls(page!.html, page!.finalUrl)), ...subpageUrls(ctx)];
     const seen = new Map<string, ThirdPartyService | string>();
     for (const url of urls) {
       const c = classifyHost(url, pageHost);
@@ -146,7 +150,7 @@ export const privacyGoogleFonts: CheckModule = {
     mode: 'passive',
     category: 'privacy',
     requires: [],
-    uses: ['artifact:render', 'artifact:page'],
+    uses: ['artifact:render', 'artifact:page', 'artifact:subpage'],
     provides: [],
     params: {},
     budget: {},
@@ -159,6 +163,7 @@ export const privacyGoogleFonts: CheckModule = {
     const urls: string[] = [];
     if (render) urls.push(...render.requests.map((r) => r.url));
     if (page) urls.push(...staticUrls(page.html, page.finalUrl));
+    urls.push(...subpageUrls(ctx));
     const hosts = new Set<string>();
     for (const u of urls) {
       try {

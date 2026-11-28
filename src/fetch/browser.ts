@@ -1,7 +1,8 @@
 import { lookup as dnsLookup } from 'node:dns';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { promisify } from 'node:util';
-import type { Browser, RenderData, RenderRequest } from '../core/types.ts';
+import type { AxeViolation, Browser, RenderAudit, RenderData, RenderRequest } from '../core/types.ts';
 import { assertAllowedUrl, isBlockedIp } from './ssrf.ts';
 import { USER_AGENT } from './http.ts';
 
@@ -26,6 +27,32 @@ export function loadPlaywright(): { chromium: { launch(o: object): Promise<any> 
   }
   throw Object.assign(new Error('Playwright is not installed'), { code: 'EDELTRAUD_NO_BROWSER' });
 }
+
+let axeSource: string | undefined;
+/** axe-core ships with the repository (vendor/axe-core), never loaded from a CDN. */
+function loadAxe(): string {
+  return (axeSource ??= readFileSync(new URL('../../vendor/axe-core/axe.min.js', import.meta.url), 'utf8'));
+}
+
+/** Runs in the page before any of its scripts: LCP, CLS and long tasks (for TBT) of this load. */
+function perfObserver() {
+  const w = window as any;
+  const m = (w.__edeltraudPerf = { lcp: null as number | null, cls: 0, tbt: 0 });
+  const obs = (type: string, cb: (e: any) => void) => {
+    try {
+      new PerformanceObserver((l) => l.getEntries().forEach(cb)).observe({ type, buffered: true });
+    } catch {
+      /* type not supported */
+    }
+  };
+  obs('largest-contentful-paint', (e) => (m.lcp = e.startTime));
+  obs('layout-shift', (e) => {
+    if (!e.hadRecentInput) m.cls += e.value;
+  });
+  obs('longtask', (e) => (m.tbt += Math.max(0, e.duration - 50)));
+}
+
+const SIZE_TYPES = new Set(['document', 'script', 'stylesheet', 'image', 'font']);
 
 /** SSRF rule for every request the page makes: public http(s) only, checked after DNS resolution. */
 export async function defaultAllowUrl(url: string): Promise<boolean> {
@@ -52,7 +79,7 @@ export class LiveBrowser implements Browser {
     this.opts = opts;
   }
 
-  async render(url: string, o: { waitMs: number; maxRequests: number; timeoutMs: number }): Promise<RenderData> {
+  async render(url: string, o: { waitMs: number; maxRequests: number; timeoutMs: number; audit?: boolean }): Promise<RenderData> {
     const allow = this.opts.allowUrl ?? defaultAllowUrl;
     if (!(await allow(url))) throw new Error(`blocked target ${url}`);
     const { chromium } = loadPlaywright();
@@ -112,6 +139,26 @@ export class LiveBrowser implements Browser {
         if (pageErrors.length < 100) pageErrors.push(String(e.message).slice(0, 500));
       });
 
+      const sizes: Promise<void>[] = [];
+      const bytes: Record<string, number> = {};
+      const images: { url: string; bytes: number }[] = [];
+      if (o.audit) {
+        await page.addInitScript(perfObserver);
+        page.on('requestfinished', (r: any) =>
+          sizes.push(
+            r.sizes().then(
+              (z: { responseBodySize: number; responseHeadersSize: number }) => {
+                const type = SIZE_TYPES.has(r.resourceType()) ? r.resourceType() : 'other';
+                const n = Math.max(0, z.responseBodySize) + Math.max(0, z.responseHeadersSize);
+                bytes[type] = (bytes[type] ?? 0) + n;
+                if (type === 'image') images.push({ url: String(r.url()).replace(/[?#].*$/, '').slice(0, 200), bytes: n });
+              },
+              () => {},
+            ),
+          ),
+        );
+      }
+
       const res = await page.goto(url, { waitUntil: 'load', timeout: o.timeoutMs });
       await page.waitForTimeout(o.waitMs);
       const html: string = await page.content();
@@ -129,6 +176,23 @@ export class LiveBrowser implements Browser {
       const cookies = ((await context.cookies()) as any[]).map((c) => ({
         name: c.name, domain: c.domain, path: c.path, expires: c.expires, httpOnly: c.httpOnly, secure: c.secure, sameSite: c.sameSite,
       }));
+      let audit: RenderAudit | undefined;
+      if (o.audit) {
+        await Promise.all(sizes);
+        const pm = (await page.evaluate(() => (window as any).__edeltraudPerf ?? null).catch(() => null)) as
+          | { lcp: number | null; cls: number; tbt: number }
+          | null;
+        audit = {
+          perf: {
+            lcpMs: pm?.lcp != null ? Math.round(pm.lcp) : null,
+            cls: pm ? Math.round(pm.cls * 1000) / 1000 : null,
+            tbtMs: pm ? Math.round(pm.tbt) : null,
+            bytes,
+            largestImages: images.sort((a, b) => b.bytes - a.bytes).slice(0, 5),
+          },
+          axe: await runAxe(page),
+        };
+      }
       return {
         url,
         finalUrl: page.url(),
@@ -143,9 +207,39 @@ export class LiveBrowser implements Browser {
         links,
         blocked,
         limitReached,
+        ...(audit ? { audit } : {}),
       };
     } finally {
       await browser.close().catch(() => {});
     }
+  }
+}
+
+/**
+ * axe-core in the rendered page (WCAG 2.0/2.1/2.2 A and AA rules). Evaluated through the
+ * DevTools protocol, so the page's CSP does not block it. Only rule ids, impact, counts and
+ * selectors leave the page, no element HTML or text.
+ */
+async function runAxe(page: any): Promise<NonNullable<RenderAudit['axe']>> {
+  try {
+    await page.evaluate(loadAxe());
+    return (await page.evaluate(async () => {
+      const axe = (window as any).axe;
+      const r = await axe.run(document, {
+        runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] },
+        resultTypes: ['violations'],
+      });
+      return {
+        version: String(axe.version),
+        violations: r.violations.map((v: any) => ({
+          id: v.id,
+          impact: v.impact ?? null,
+          nodes: v.nodes.length,
+          targets: v.nodes.slice(0, 3).map((n: any) => String(n.target?.[0] ?? '').slice(0, 80)),
+        })),
+      };
+    })) as { version: string; violations: AxeViolation[] };
+  } catch (e) {
+    return { error: (e instanceof Error ? e.message : String(e)).slice(0, 200) };
   }
 }

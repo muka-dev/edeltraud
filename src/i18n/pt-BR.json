@@ -115,7 +115,16 @@
     "jobs.ownership.valid": "O comprovante pode ser colocado até {date} (14 dias).",
     "jobs.failure.subject": "Sobre a verificação de {host}",
     "jobs.failure.title": "Não foi possível concluir automaticamente a verificação de {host}",
-    "jobs.failure.body": "Isso acontece ocasionalmente. Markus Kosmal analisa o caso pessoalmente, em regra em um dia útil. Nenhuma ação é necessária."
+    "jobs.failure.body": "Isso acontece ocasionalmente. Markus Kosmal analisa o caso pessoalmente, em regra em um dia útil. Nenhuma ação é necessária.",
+    "report.fix.title": "Mandar corrigir: pacote de correção",
+    "report.fix.text": "Até 5 resultados críticos ou altos deste relatório são corrigidos em até 4 horas, como pull request no repositório, com nova verificação em seguida. 390 € sem impostos, 2 vagas por mês.",
+    "report.fix.cta": "Solicitar o pacote de correção",
+    "jobs.watchOwnership.subject": "WatchDog para {host}: comprovante para a verificação aprofundada mensal",
+    "jobs.watchOwnership.title": "O WatchDog para {host} está ativo – opcionalmente com verificação aprofundada mensal",
+    "jobs.watchOwnership.why": "A partir de agora, o WatchDog verifica toda semana de forma passiva, ou seja, como um visitante vê o aplicativo. Uma vez por mês ele também pode verificar de forma ativa (por exemplo regras do banco de dados e limite de tentativas de login). Isso só é permitido em aplicativos do cliente; basta um registro DNS como comprovante.",
+    "jobs.watchOwnership.dns": "Registro DNS TXT",
+    "jobs.watchOwnership.linkLabel": "Verificar comprovante",
+    "jobs.watchOwnership.keep": "Manter o registro enquanto o WatchDog estiver ativo: ele é verificado de novo, sem aviso, antes de cada verificação aprofundada mensal. Sem ele, continua a verificação passiva semanal."
   },
   "findings": {
     "secrets.server-key": {
@@ -378,6 +387,11 @@
       "explain": "Os cabeçalhos de resposta indicam PHP {version}. Este número de versão está no intervalo de {advisories} (PHP2Shell, execução remota de código sem autenticação, CVSS 9.2). Corrigido no PHP 8.5.12, 8.4.27, 8.3.36 e 8.2.35; para 8.1 e anteriores não há correção oficial. As distribuições Linux costumam portar correções (backports) mantendo o número de versão antigo, por exemplo o Ubuntu 24.04 com 8.3.6. O número de versão apenas sugere a vulnerabilidade; o provedor de hospedagem ou a distribuição pode já a ter corrigido.",
       "fix": "1. Executar php -v e consultar o aviso de segurança da distribuição ou do provedor de hospedagem para confirmar se a correção está incluída. 2. Caso contrário, atualizar para PHP {fixed} ou superior. 3. Ocultar a versão nos cabeçalhos de resposta."
     },
+    "server.php-update": {
+      "title": "PHP {version}: falta a atualização de segurança de 19/11/2026 (talvez já corrigida)",
+      "explain": "Os cabeçalhos de resposta indicam PHP {version}. Em 19/11/2026 foram corrigidas 18 falhas no PHP, entre elas {advisories} (incluindo request smuggling no PHP-FPM e execução de código). As falhas graves exigem uma configuração pouco comum. As distribuições portam correções mantendo o número de versão antigo, por isso a versão apenas sugere que a atualização está faltando.",
+      "fix": "1. Verificar com php -v e o aviso de segurança da distribuição ou do provedor de hospedagem se a atualização está incluída. 2. Caso contrário, atualizar o PHP para {fixed} ou superior, ou pedir ao provedor de hospedagem. 3. Ocultar a versão nos cabeçalhos de resposta."
+    },
     "server.php-eol": {
       "title": "PHP {version} já não recebe manutenção",
       "explain": "Os cabeçalhos de resposta indicam PHP {version}. Este ramo já não recebe atualizações de segurança, pelo que novas vulnerabilidades não são corrigidas. Algumas distribuições mantêm ramos por mais tempo, o que não é visível do exterior.",
@@ -543,6 +557,26 @@
       "explain": "Uma requisição GET anônima (sem cookies nem credenciais) para {path} retornou dados JSON: {count} entradas, campos {fields}. Apenas a quantidade e os nomes dos campos foram guardados, nenhum valor. Se os dados não devem ser públicos, qualquer pessoa com o endereço pode lê-los.",
       "fix": "1. Definir se o endpoint deve ser público. 2. Se não: verificar a autenticação no servidor e limitar o acesso aos registros da própria pessoa. 3. Retornar apenas os campos necessários. 4. Chamar novamente sem login e confirmar que responde 401 ou 403."
     },
+    "ai.edge-function-open": {
+      "title": "A função de IA {name} roda sem login",
+      "explain": "A Supabase Edge Function {name} parece chamar um modelo de linguagem. Uma única requisição só com a chave pública do app (sem login) e um conteúdo propositalmente inválido não foi recusada: a função rodou até ler a entrada. Nenhum prompt real foi enviado, apenas o código de status foi guardado. Provavelmente qualquer pessoa pode chamar a função quantas vezes quiser e gastar o orçamento de LLM do app (abuso de custos).",
+      "fix": "1. Verificar o JWT na função e garantir com auth.getUser() que quem chama está logado; caso contrário, retornar 401. A chave pública anon sozinha não é login. 2. Limitar as requisições por usuário (rate limit). 3. Definir um limite de gastos no provedor de LLM. 4. Chamar novamente sem login e confirmar que responde 401."
+    },
+    "ratelimit.auth.supabase": {
+      "title": "O login não limita tentativas falhas (Supabase)",
+      "explain": "O login do Supabase com e-mail e senha recebeu {attempts} tentativas falhas com o mesmo endereço inventado (terminado em example.invalid, nenhuma conta real) e pausas curtas. Nenhuma foi barrada com HTTP 429. Só foram guardados códigos de status e contagens. Provavelmente é possível testar senhas em grande quantidade. O Supabase limita em parte por IP em uma janela mais longa; esses limites são configuráveis por projeto no dashboard e não são totalmente visíveis de fora.",
+      "fix": "1. No dashboard do Supabase, em Authentication → Rate Limits, reduzir o limite de logins. 2. Ativar a proteção CAPTCHA (hCaptcha ou Cloudflare Turnstile) para o login e incluí-la no formulário. 3. Verificar novamente que tentativas falhas repetidas recebem 429."
+    },
+    "ratelimit.auth.firebase": {
+      "title": "O login não limita tentativas falhas (Firebase)",
+      "explain": "O login do Firebase (signInWithPassword) recebeu {attempts} tentativas falhas com o mesmo endereço inventado (terminado em example.invalid, nenhuma conta real) e pausas curtas. Nenhuma foi barrada (sem HTTP 429, sem TOO_MANY_ATTEMPTS_TRY_LATER). Só foram guardados códigos de status e contagens. Provavelmente é possível testar senhas em grande quantidade. O Firebase limita em parte por IP em uma janela mais longa, o que não é totalmente visível de fora.",
+      "fix": "1. Ativar e exigir o Firebase App Check com reCAPTCHA Enterprise para Authentication. 2. Ligar a proteção contra enumeração de e-mails em Authentication → Configurações. 3. Se necessário, configurar reCAPTCHA Enterprise para o login com senha. 4. Verificar novamente que tentativas falhas repetidas são barradas."
+    },
+    "auth.enumeration": {
+      "title": "O login revela se uma conta existe (Firebase)",
+      "explain": "Uma única tentativa de login com um endereço inventado (terminado em example.invalid) recebeu do Firebase EMAIL_NOT_FOUND em vez da mensagem uniforme INVALID_LOGIN_CREDENTIALS. A proteção contra enumeração de e-mails está desligada: qualquer pessoa pode verificar quais endereços têm conta no app e atacá-los com tentativas de senha ou phishing. Só foi guardado o código de erro.",
+      "fix": "1. No console do Firebase, em Authentication → Configurações → Ações do usuário, ativar a proteção contra enumeração de e-mails. 2. Usar no app uma mensagem de erro uniforme (\"e-mail ou senha incorretos\"). 3. Ativar o App Check com reCAPTCHA Enterprise. 4. Verificar novamente que um endereço desconhecido retorna INVALID_LOGIN_CREDENTIALS."
+    },
     "auth.client-only": {
       "title": "O controle de acesso das áreas de administração parece existir só no navegador",
       "explain": "O código do front-end contém rotas de administração ({routes}) junto com verificações de papel como role === \"admin\", mas nenhum endpoint em /api/admin nem Edge Functions com \"admin\" no nome. É um indício, não uma prova. Esconder a interface não protege dados: quem chamar os endpoints diretamente contorna qualquer verificação no navegador. As permissões precisam ser aplicadas no servidor ou no banco de dados (Row Level Security).",
@@ -562,6 +596,126 @@
       "title": "O CORS reflete qualquer origem ({path})",
       "explain": "A resposta de {path} devolveu em Access-Control-Allow-Origin a origem de um domínio alheio e inventado, sem permitir credenciais. Em dados públicos isso costuma ser intencional; em dados não públicos a lista de origens permitidas deve ser limitada.",
       "fix": "1. Verificar se o endpoint deve ser legível a partir de qualquer site. 2. Se não: usar uma lista fixa de origens próprias. 3. Testar de novo com uma origem alheia."
+    },
+    "a11y.no-lang": {
+      "title": "Idioma da página não indicado",
+      "explain": "Em {pages} página(s) o atributo lang no elemento <html> falta ou está vazio. Os leitores de tela o usam para escolher a pronúncia; sem ele, o texto é muitas vezes lido de forma errada. Na Alemanha, a lei de acessibilidade BFSG (em vigor desde 28/06/2025, transpõe o Ato Europeu de Acessibilidade) se aplica a muitos serviços para consumidores. Só uma pequena parte pode ser verificada automaticamente; é uma indicação, não uma afirmação sobre o cumprimento de requisitos legais.",
+      "fix": "1. Definir o idioma no elemento <html>, por exemplo <html lang=\"pt\">. 2. Em aplicativos multilíngues, definir o valor por idioma. 3. Marcar passagens em outro idioma com lang próprio."
+    },
+    "a11y.img-alt": {
+      "title": "{count} imagens sem texto alternativo",
+      "explain": "{count} imagens em {pages} página(s) não têm atributo alt, por exemplo {sample}. Os leitores de tela leem então o nome do arquivo ou nada. Na Alemanha, a lei de acessibilidade BFSG (em vigor desde 28/06/2025, transpõe o Ato Europeu de Acessibilidade) se aplica a muitos serviços para consumidores. Só uma pequena parte pode ser verificada automaticamente; é uma indicação, não uma afirmação sobre o cumprimento de requisitos legais.",
+      "fix": "1. Para imagens com conteúdo, escrever um texto alt curto que diga o que a imagem mostra ou faz. 2. Marcar imagens puramente decorativas com alt=\"\". 3. Passar sempre alt aos componentes de imagem (por exemplo Image no Next.js)."
+    },
+    "a11y.input-label": {
+      "title": "{count} campos de formulário sem rótulo",
+      "explain": "{count} campos de formulário em {pages} página(s) não têm rótulo associado, por exemplo {sample}. Um placeholder não substitui um rótulo: desaparece ao digitar e não é lido de forma confiável. Na Alemanha, a lei de acessibilidade BFSG (em vigor desde 28/06/2025, transpõe o Ato Europeu de Acessibilidade) se aplica a muitos serviços para consumidores. Só uma pequena parte pode ser verificada automaticamente; é uma indicação, não uma afirmação sobre o cumprimento de requisitos legais.",
+      "fix": "1. Associar a cada campo um <label for=\"id\"> ou envolvê-lo em <label>. 2. Onde não couber um rótulo visível, definir aria-label. 3. Verificar com teclado e leitor de tela que cada campo é anunciado."
+    },
+    "a11y.control-name": {
+      "title": "{count} botões ou links sem nome acessível",
+      "explain": "{count} botões ou links em {pages} página(s) não têm texto, aria-label nem title, por exemplo {sample}. Muitas vezes são botões de ícone (menu, fechar, redes sociais). Os leitores de tela anunciam então apenas \"botão\" ou o endereço. Na Alemanha, a lei de acessibilidade BFSG (em vigor desde 28/06/2025, transpõe o Ato Europeu de Acessibilidade) se aplica a muitos serviços para consumidores. Só uma pequena parte pode ser verificada automaticamente; é uma indicação, não uma afirmação sobre o cumprimento de requisitos legais.",
+      "fix": "1. Dar aos botões de ícone um aria-label, por exemplo aria-label=\"Abrir menu\". 2. Definir texto alt em imagens dentro de links. 3. Ocultar ícones puramente decorativos com aria-hidden=\"true\"."
+    },
+    "a11y.zoom-blocked": {
+      "title": "Ampliação bloqueada em dispositivos móveis",
+      "explain": "A meta tag viewport impede a ampliação ({sample}). Pessoas com baixa visão não conseguem então ampliar a página no celular. Na Alemanha, a lei de acessibilidade BFSG (em vigor desde 28/06/2025, transpõe o Ato Europeu de Acessibilidade) se aplica a muitos serviços para consumidores. Só uma pequena parte pode ser verificada automaticamente; é uma indicação, não uma afirmação sobre o cumprimento de requisitos legais.",
+      "fix": "1. Remover user-scalable=no e maximum-scale. 2. Recomendado: <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">. 3. Verificar no celular que o zoom com dois dedos funciona."
+    },
+    "a11y.no-title": {
+      "title": "Página sem título",
+      "explain": "Em {pages} página(s) o <title> falta ou está vazio. O título é a primeira coisa que os leitores de tela anunciam e aparece na aba do navegador. Na Alemanha, a lei de acessibilidade BFSG (em vigor desde 28/06/2025, transpõe o Ato Europeu de Acessibilidade) se aplica a muitos serviços para consumidores. Só uma pequena parte pode ser verificada automaticamente; é uma indicação, não uma afirmação sobre o cumprimento de requisitos legais.",
+      "fix": "1. Dar a cada página um <title> único, por exemplo \"Preços – Nome da app\". 2. Em aplicativos de página única, definir o título por rota."
+    },
+    "a11y.no-statement": {
+      "title": "Nenhum link para declaração de acessibilidade",
+      "explain": "Não foi encontrado nenhum link para uma declaração de acessibilidade (por exemplo \"Acessibilidade\" ou /acessibilidade). Se um serviço estiver abrangido pela lei alemã BFSG (desde 28/06/2025, muitos serviços para consumidores; baseada no Ato Europeu de Acessibilidade), espera-se informação sobre acessibilidade. Se ela se aplica depende do serviço e do porte da empresa; é uma indicação, não uma avaliação jurídica.",
+      "fix": "1. Esclarecer se o serviço está abrangido pela BFSG ou pelo Ato Europeu de Acessibilidade. 2. Em caso afirmativo: criar uma página com informação sobre acessibilidade (estado, limitações conhecidas, contato para comentários). 3. Colocar um link no rodapé de todas as páginas."
+    },
+    "seo.title-missing": {
+      "title": "Página inicial sem título",
+      "explain": "O HTML entregue da página inicial não tem <title> ou está vazio. Motores de busca e pré-visualizações de links mostram então o endereço ou um texto escolhido por eles.",
+      "fix": "1. Definir um <title> curto e único com nome e benefício (até cerca de 60 caracteres). 2. Em aplicativos de página única, colocar o título já no index.html entregue."
+    },
+    "seo.title-long": {
+      "title": "Título da página inicial longo demais ({length} caracteres)",
+      "explain": "O <title> da página inicial tem {length} caracteres. Os motores de busca cortam a partir de cerca de {max} caracteres; o fim deixa então de ser visível.",
+      "fix": "1. Encurtar o título para no máximo {max} caracteres. 2. Colocar o mais importante (nome, benefício) no início."
+    },
+    "seo.description-missing": {
+      "title": "Sem meta description",
+      "explain": "A página inicial não tem <meta name=\"description\">. Motores de busca e pré-visualizações escolhem então um trecho de texto por conta própria, muitas vezes pouco adequado.",
+      "fix": "1. Escrever uma descrição de cerca de 120–160 caracteres que diga o que o aplicativo faz. 2. Colocá-la como <meta name=\"description\" content=\"…\"> no <head>."
+    },
+    "seo.canonical-missing": {
+      "title": "Sem endereço canônico",
+      "explain": "A página inicial não indica um endereço canônico (<link rel=\"canonical\">). Se a página for acessível em vários endereços (com/sem www, domínio da plataforma como *.vercel.app), os motores de busca podem mostrar o endereço errado.",
+      "fix": "1. Definir <link rel=\"canonical\" href=\"https://dominio-proprio/\"> no <head>. 2. Redirecionar o domínio da plataforma para o domínio próprio."
+    },
+    "seo.noindex": {
+      "title": "Página inicial oculta dos motores de busca (noindex)",
+      "explain": "A página inicial está marcada como noindex através de {source}. Os motores de busca não a incluem. Em ambientes de teste e pré-visualização é o correto; em produção costuma ser um engano – é intencional?",
+      "fix": "1. Verificar se a página deve ser encontrada. 2. Em caso afirmativo: remover noindex da meta tag robots ou do cabeçalho X-Robots-Tag (muitas vezes uma configuração da plataforma ou um resto do desenvolvimento). 3. Depois voltar a submeter na Search Console."
+    },
+    "seo.h1-missing": {
+      "title": "Sem título principal (h1)",
+      "explain": "A página inicial não tem <h1>. O título principal ajuda motores de busca e leitores de tela a reconhecer o tema da página.",
+      "fix": "1. Definir exatamente um <h1> com o benefício principal. 2. Estruturar os restantes títulos como <h2>, <h3>."
+    },
+    "seo.h1-multiple": {
+      "title": "Vários títulos principais ({count} × h1)",
+      "explain": "A página inicial tem {count} títulos <h1>. O habitual é um título principal; vários tornam o tema da página menos claro.",
+      "fix": "1. Manter um <h1>. 2. Converter os restantes em <h2> ou <h3> (manter o visual com CSS)."
+    },
+    "seo.og-missing": {
+      "title": "Faltam tags Open Graph: {list}",
+      "explain": "Faltam na página inicial as tags Open Graph {list}. Ao compartilhar no LinkedIn, WhatsApp ou Slack não aparece pré-visualização ou aparece uma aleatória.",
+      "fix": "1. Adicionar <meta property=\"og:title\"> e <meta property=\"og:image\"> (imagem de cerca de 1200 × 630 pixels, endereço absoluto) no <head>. 2. Verificar com as ferramentas de pré-visualização das plataformas."
+    },
+    "ops.soft-404": {
+      "title": "Endereços inexistentes respondem 200 (soft 404)",
+      "explain": "Endereços inventados ({paths}) respondem com o status {status} e uma página HTML em vez de 404. Os motores de busca indexam essas páginas como conteúdo duplicado, o monitoramento não detecta links quebrados e programas que esperam uma API recebem HTML.",
+      "fix": "1. Para rotas desconhecidas, entregar uma página 404 com o status 404 (em aplicativos de página única: fallback apenas para rotas reais, por exemplo através da configuração do servidor ou da plataforma). 2. Responder sempre a caminhos desconhecidos em /api/ com 404 e JSON. 3. Verificar com um endereço inventado."
+    },
+    "a11y.contrast": {
+      "title": "Contraste de cor insuficiente ({count} elementos)",
+      "explain": "{count} elementos da página inicial têm pouco contraste entre texto e fundo (WCAG 1.4.3), por exemplo {sample}. Pessoas com baixa visão, e todos sob luz solar, têm dificuldade em lê-los. Verificado com axe-core no DOM renderizado. Na UE, a Lei Europeia de Acessibilidade vale desde 28/06/2025 para muitos serviços ao consumidor; no Brasil, a Lei Brasileira de Inclusão (LBI) exige sites acessíveis. A verificação automática cobre apenas uma parte; isto é uma indicação, não uma declaração sobre o cumprimento de requisitos legais.",
+      "fix": "1. Ajustar a cor do texto ou do fundo: pelo menos 4,5:1, 3:1 para texto grande. 2. Verificar sobretudo indicações em cinza claro, placeholders e texto sobre imagens. 3. Medir de novo com um verificador de contraste ou as ferramentas de desenvolvedor."
+    },
+    "a11y.axe": {
+      "title": "Acessibilidade: regra {rule} violada ({count} elementos)",
+      "explain": "O axe-core indica {count} elementos afetados na página inicial para a regra {rule}, por exemplo {sample}. Descrição e exemplos da regra: {link} Na UE, a Lei Europeia de Acessibilidade vale desde 28/06/2025 para muitos serviços ao consumidor; no Brasil, a Lei Brasileira de Inclusão (LBI) exige sites acessíveis. A verificação automática cobre apenas uma parte; isto é uma indicação, não uma declaração sobre o cumprimento de requisitos legais.",
+      "fix": "1. Ler a descrição da regra em {link}. 2. Corrigir os elementos indicados. 3. Verificar de novo, por exemplo com a extensão axe DevTools."
+    },
+    "perf.weight-total": {
+      "title": "A página inicial carrega {size}",
+      "explain": "Na primeira visita, a página inicial transfere {size} no total. Em redes móveis isto demora e gasta dados. Medido em um único carregamento em laboratório (desktop); os valores reais dos visitantes podem ser diferentes.",
+      "fix": "1. Reduzir as imagens e entregá-las em WebP/AVIF. 2. Remover scripts e fontes desnecessários ou carregá-los mais tarde. 3. Verificar a compressão (gzip/brotli) e o cache."
+    },
+    "perf.weight-js": {
+      "title": "{size} de JavaScript na primeira visita",
+      "explain": "A página inicial carrega {size} de JavaScript (transferido, comprimido). O dispositivo tem de carregar e executar tudo antes que a página reaja; em celulares simples isso demora segundos. Medido em um único carregamento em laboratório (desktop); os valores reais dos visitantes podem ser diferentes.",
+      "fix": "1. Encontrar os maiores pacotes com um bundle analyzer. 2. Carregar partes pouco usadas com dynamic import. 3. Substituir bibliotecas grandes por outras menores ou importar só o necessário."
+    },
+    "perf.weight-image": {
+      "title": "{count} imagens muito grandes",
+      "explain": "{count} imagens da página inicial têm mais de 500 KB, por exemplo {sample}.",
+      "fix": "1. Reduzir as imagens ao tamanho apresentado. 2. Entregá-las em WebP ou AVIF. 3. Usar srcset e loading=\"lazy\" para imagens fora do primeiro tela."
+    },
+    "perf.lcp": {
+      "title": "O conteúdo principal aparece tarde (LCP {value})",
+      "explain": "O maior elemento visível apareceu após {value} (bom: até {limit}). Até lá, os visitantes veem uma página vazia ou incompleta. Medido em um único carregamento em laboratório (desktop); os valores reais dos visitantes podem ser diferentes.",
+      "fix": "1. Carregar cedo a imagem ou o título principal (preload, sem lazy loading na primeira imagem). 2. Reduzir scripts e fontes que bloqueiam a renderização. 3. Em aplicações de página única, pré-renderizar o conteúdo no servidor ou de forma estática."
+    },
+    "perf.cls": {
+      "title": "O layout salta durante o carregamento (CLS {value})",
+      "explain": "O conteúdo se desloca visivelmente durante o carregamento (CLS {value}, bom: até {limit}). Isto provoca cliques errados. Medido em um único carregamento em laboratório (desktop); os valores reais dos visitantes podem ser diferentes.",
+      "fix": "1. Dar a imagens e incorporações largura e altura fixas (ou aspect-ratio). 2. Reservar espaço para banners e conteúdo carregado depois. 3. Carregar fontes com font-display e um fonte substituta adequado."
+    },
+    "perf.tbt": {
+      "title": "A página reage com atraso (TBT {value})",
+      "explain": "Tarefas longas de script bloqueiam o navegador durante {value} no total (bom: até {limit}). Cliques e entradas reagem com atraso nesse tempo. Medido em um único carregamento em laboratório (desktop); os valores reais dos visitantes podem ser diferentes.",
+      "fix": "1. Dividir scripts grandes e carregá-los mais tarde. 2. Evitar trabalho pesado no início ou movê-lo para um web worker. 3. Rever e reduzir scripts de terceiros."
     }
   }
 }

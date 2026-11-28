@@ -1,5 +1,5 @@
 // Known-vulnerable client-side libraries.
-// Stand: 20.11.2026, curated, not exhaustive.
+// Stand: 27.11.2026, curated, not exhaustive. Checked against GHSA, nextjs.org and php.net on 27.11.2026.
 // Data only. Ranges are [introduced, fixed): introduced inclusive (null = from the start), fixed exclusive.
 // Only advisories that are well known are listed; a missing entry does not mean a version is free of issues.
 
@@ -85,9 +85,15 @@ export const VULN_DB: LibraryEntry[] = [
     rules: [
       {
         ranges: [r(null, '4.17.21')],
-        severity: 'medium',
+        severity: 'high',
         ids: ['CVE-2021-23337', 'CVE-2020-8203', 'CVE-2019-10744'],
         source: 'https://github.com/lodash/lodash/security/advisories',
+      },
+      {
+        ranges: [r('4.0.0', '4.17.23')],
+        severity: 'medium',
+        ids: ['CVE-2025-13465'],
+        source: 'https://security.snyk.io/vuln/SNYK-JS-LODASH-15053838',
       },
     ],
   },
@@ -135,7 +141,7 @@ export const VULN_DB: LibraryEntry[] = [
     rules: [
       {
         ranges: [r('11.1.4', '12.3.5'), r('13.0.0', '13.5.9'), r('14.0.0', '14.2.25'), r('15.0.0', '15.2.3')],
-        severity: 'high',
+        severity: 'critical',
         ids: ['CVE-2025-29927'],
         source: 'https://github.com/vercel/next.js/security/advisories',
       },
@@ -154,18 +160,26 @@ export const VULN_DB: LibraryEntry[] = [
         source: 'https://github.com/vercel/next.js/security/advisories',
       },
       {
-        // Vercel release of 2026-08-25: two critical unauthenticated RCE issues (AVIF/libheif heap overflow, Windows path traversal), fixed in 15.5.24 and 16.3.3.
-        // The id list is joined with ', ' for the finding text, so the descriptive label is the second entry.
-        ranges: [r('15.0.0', '15.5.24'), r('16.0.0', '16.3.3')],
-        severity: 'high',
-        ids: ['CVE-2026-75604', 'AVIF/libheif RCE (Aug 2026)'],
-        source: 'https://github.com/vercel/next.js/security/advisories',
+        // Release of 2026-08-25: unauthenticated RCE via AVIF/libheif (GHSA-2xp9-vwfh-vxw4, from 10.0.0)
+        // and Windows path traversal (CVE-2026-75604, from 13.4); fixed in 15.5.24 and 16.3.3.
+        ranges: [r('10.0.0', '15.5.24'), r('16.0.0', '16.3.3')],
+        severity: 'critical',
+        ids: ['CVE-2026-75604', 'GHSA-2xp9-vwfh-vxw4'],
+        source: 'https://nextjs.org/blog/august-2026-security-release',
+      },
+      {
+        // Release of 2026-10-14: RCE via SVG image optimisation (from 10.0.0) and via `use cache`
+        // with typed arrays (16.0.0–16.4.0); fixed in 15.5.28 and 16.4.1.
+        ranges: [r('10.0.0', '15.5.28'), r('16.0.0', '16.4.1')],
+        severity: 'critical',
+        ids: ['CVE-2026-96889', 'GHSA-673q-mjm6-r5xr'],
+        source: 'https://github.com/vercel/next.js/security/advisories/GHSA-2464-fhr4-w9xw',
       },
     ],
   },
 ];
 
-/** PHP releases fixed for PHP2Shell, and branches without support. Stand: 20.11.2026. */
+/** PHP releases fixed for PHP2Shell, the latest security round, and branches without support. Stand: 27.11.2026. */
 export interface ServerDb {
   php: {
     advisories: string[];
@@ -180,6 +194,8 @@ export interface ServerDb {
     /** Branches whose security support ends soon: branch -> YYYY-MM. */
     eolSoon: Record<string, string>;
     eolSource: string;
+    /** Latest security round (after PHP2Shell): first fixed release per branch. */
+    update: { advisories: string[]; fixed: Record<string, string>; source: string };
   };
 }
 
@@ -192,6 +208,12 @@ export const SERVER_DB: ServerDb = {
     eol: { '8.1': '2025-12', '8.0': '2023-11', '7.4': '2022-11', '7.3': '2021-12', '7.2': '2020-11', '7.1': '2019-12', '7.0': '2019-01', '5.6': '2018-12' },
     eolSoon: { '8.2': '2026-12' },
     eolSource: 'https://www.php.net/supported-versions.php',
+    // 2026-11-19: 18 issues, incl. PHP-FPM request smuggling and RCE that need a non-default configuration.
+    update: {
+      advisories: ['CVE-2026-129289', 'CVE-2026-129474', 'CVE-2026-129496', 'CVE-2026-126714', 'CVE-2026-115560'],
+      fixed: { '8.5': '8.5.13', '8.4': '8.4.28', '8.3': '8.3.37', '8.2': '8.2.36' },
+      source: 'https://www.php.net/archive/2026.php',
+    },
   },
 };
 

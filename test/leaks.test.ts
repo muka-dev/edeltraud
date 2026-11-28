@@ -46,11 +46,14 @@ test('server: PHP in the Server header, fixed and unaffected versions', async ()
   const a = await run(site({ headers: { server: 'Apache/2.4.58 (Ubuntu) PHP/8.1.2' } }));
   assert.deepEqual(ids(a, 'deps.server').map((x) => x.messageKey).sort(), ['server.php-eol', 'server.php2shell']);
   assert.equal(ids(a, 'deps.server').find((x) => x.messageKey === 'server.php2shell')!.vars!['fixed'], '–');
-  for (const v of ['8.4.27', '8.3.36', '8.5.12', '8.6.0']) {
+  for (const v of ['8.4.28', '8.3.37', '8.5.13', '8.6.0']) {
     const r = await run(site({ headers: { 'x-powered-by': `PHP/${v}` } }));
     assert.equal(ids(r, 'deps.server').length, 0, v);
     assert.equal(r.facts['server.php'], v);
   }
+  // patched for PHP2Shell but not for the round of 2026-11-19: medium/possible update hint only
+  const u = ids(await run(site({ headers: { 'x-powered-by': 'PHP/8.4.27' } })), 'deps.server');
+  assert.deepEqual(u.map((x) => [x.messageKey, x.severity, x.confidence, x.vars!['fixed']]), [['server.php-update', 'medium', 'possible', '8.4.28']]);
   assert.equal(ids(await run(site({ headers: { 'x-powered-by': 'PHP/8.4.26' } })), 'deps.server')[0]!.vars!['fixed'], '8.4.27');
 });
 
@@ -59,7 +62,7 @@ test('server: EOL, EOL soon, non-PHP software', async () => {
   const e = ids(eol, 'deps.server').find((x) => x.messageKey === 'server.php-eol')!;
   assert.equal(e.severity, 'medium');
   assert.equal(e.vars!['version'], '7.4.33');
-  const soon = await run(site({ headers: { 'x-powered-by': 'PHP/8.2.35' } }));
+  const soon = await run(site({ headers: { 'x-powered-by': 'PHP/8.2.36' } }));
   const s = ids(soon, 'deps.server');
   assert.deepEqual(s.map((x) => x.messageKey), ['server.php-eol-soon']);
   assert.equal(s[0]!.severity, 'info');
@@ -71,20 +74,20 @@ test('server: EOL, EOL soon, non-PHP software', async () => {
 
 // ---- Next.js rule ----
 
-test('deps-db: Next.js August 2026 rule', () => {
+test('deps-db: Next.js August and October 2026 rules', () => {
   const v = matchVulnerabilities('nextjs', '15.5.23')!;
-  assert.ok(v.ids.includes('CVE-2026-75604'));
-  assert.ok(v.ids.includes('AVIF/libheif RCE (Aug 2026)'));
-  assert.equal(v.fixed, '15.5.24');
-  assert.equal(matchVulnerabilities('nextjs', '15.5.24'), null);
-  assert.equal(matchVulnerabilities('nextjs', '16.3.2')!.severity, 'high');
-  assert.equal(matchVulnerabilities('nextjs', '16.3.2')!.fixed, '16.3.3');
-  assert.equal(matchVulnerabilities('nextjs', '16.3.3'), null);
-  assert.equal(matchVulnerabilities('nextjs', '14.2.25'), null);
+  assert.ok(v.ids.includes('CVE-2026-75604') && v.ids.includes('GHSA-2xp9-vwfh-vxw4') && v.ids.includes('CVE-2026-96889'));
+  assert.equal(v.severity, 'critical');
+  assert.equal(v.fixed, '15.5.28');
+  assert.deepEqual(matchVulnerabilities('nextjs', '15.5.24')!.ids, ['CVE-2026-96889', 'GHSA-673q-mjm6-r5xr']);
+  assert.equal(matchVulnerabilities('nextjs', '15.5.28'), null);
+  assert.equal(matchVulnerabilities('nextjs', '16.3.2')!.fixed, '16.4.1');
+  assert.equal(matchVulnerabilities('nextjs', '16.4.1'), null);
+  assert.equal(matchVulnerabilities('nextjs', '9.5.5'), null);
   // overlap with React2Shell keeps the higher severity and the highest fixed version
   const o = matchVulnerabilities('nextjs', '15.5.5')!;
   assert.equal(o.severity, 'critical');
-  assert.equal(o.fixed, '15.5.24');
+  assert.equal(o.fixed, '15.5.28');
 });
 
 // ---- next.data-leak ----

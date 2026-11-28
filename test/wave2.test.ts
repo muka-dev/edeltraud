@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import { runOn } from './helpers.ts';
 import { cleanSite } from './fixtures/sites.ts';
 
-const ids = (r: { findings: { id: string }[] }) => [...new Set(r.findings.map((f) => f.id))].sort();
+// a11y, SEO and 404 hints have their own tests (a11y-seo.test.ts).
+const QUALITY = /^(a11y|seo)\.|^ops\.404\//;
+const ids = (r: { findings: { id: string }[] }) => [...new Set(r.findings.map((f) => f.id))].filter((id) => !QUALITY.test(id)).sort();
 const DAY = 86_400_000;
 const NOW = Date.parse('2026-11-20T12:00:00.000Z');
 const iso = (ms: number) => new Date(ms).toISOString();

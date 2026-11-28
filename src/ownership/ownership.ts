@@ -139,3 +139,14 @@ export function covers(v: Verification, host: string, now = Date.now()): boolean
   const h = normHost(host);
   return v.scope === 'domain' ? h === v.host || h.endsWith(`.${registrableDomain(v.host)}`) || h === registrableDomain(v.host) : h === v.host;
 }
+
+/**
+ * WatchDog: a DNS proof stays valid as long as the TXT record is still there. Checks the
+ * record where it was found; returns the refreshed verification, or null if it is gone.
+ */
+export async function recheckDns(v: Verification, token: string, dns: Dns, now = Date.now()): Promise<Verification | null> {
+  if (v.method !== 'dns') return null;
+  const txt = await dns.resolve(v.where, 'TXT').catch(() => [] as string[]);
+  if (!txt.some((t) => t.trim() === `edeltraud-verify=${token}`)) return null;
+  return { ...v, verifiedAt: new Date(now).toISOString(), expiresAt: new Date(now + VERIFICATION_TTL_MS).toISOString() };
+}

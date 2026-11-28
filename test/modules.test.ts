@@ -5,7 +5,9 @@ import { cleanSite, vulnerableSite, FAKE } from './fixtures/sites.ts';
 import { scanText } from '../src/modules/analyze/secrets.ts';
 import { extractChunkRefs, extractScripts } from '../src/modules/util.ts';
 
-const kinds = (fs: { id: string }[]) => fs.map((f) => f.id).sort();
+// a11y, SEO and 404 hints have their own tests (a11y-seo.test.ts).
+const QUALITY = /^(a11y|seo)\.|^ops\.404\//;
+const kinds = (fs: { id: string }[]) => fs.map((f) => f.id).filter((id) => !QUALITY.test(id)).sort();
 
 test('secrets: server keys found, public keys ignored', () => {
   const hit = (t: string) => scanText({ url: 'x', text: t }).map((h) => h.kind);
@@ -114,4 +116,19 @@ test('stack: Clerk key recognised by its encoded host, Stripe key is not Clerk',
   assert.equal(a.result.facts['stack.clerk'], true);
   const b = await runOn(site(`Stripe("${FAKE.stripePub}")`), 'https://c.example.com/', 'ampel');
   assert.equal(b.result.facts['stack.clerk'], false);
+});
+
+test('secrets.frontend: key only in the sources of a public source map (report plan), masked; ampel does not download maps', async () => {
+  const site = vulnerableSite();
+  const key = 'gsk_' + 'Q7w'.repeat(17) + 'Z';
+  site['https://vibe.example.com/assets/index-Bx7kP2qa.js.map'] = {
+    body: JSON.stringify({ version: 3, sources: ['src/lib/ai.ts'], sourcesContent: [`const groq = "${key}";`], mappings: 'AAAA' }),
+  };
+  const { result } = await runOn(site, 'https://vibe.example.com/', 'report');
+  const f = result.findings.find((x) => x.id === 'secrets.frontend/groq-key')!;
+  assert.ok(f, 'found in sourcesContent');
+  assert.equal(f.location.url, 'https://vibe.example.com/assets/index-Bx7kP2qa.js.map → src/lib/ai.ts');
+  assert.ok(!JSON.stringify(result).includes(key));
+  const ampel = (await runOn(site, 'https://vibe.example.com/', 'ampel')).result;
+  assert.equal(ampel.findings.find((x) => x.id === 'secrets.frontend/groq-key'), undefined);
 });

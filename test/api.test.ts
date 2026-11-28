@@ -213,3 +213,14 @@ test('static page: PNG (link preview image) is served with its type', async () =
     assert.equal((await fetch(`${base}/`, { method: 'HEAD' })).status, 200);
   });
 });
+
+test('health: extra check answers 503 without personal data when not ok', async () => {
+  let ok = true;
+  await withApi({ http: new ReplayHttp({}), pow: false, health: async () => (ok ? { ok: true } : { ok: false, jobs: 'stalled', stalled: 2 }) }, async (base) => {
+    assert.equal((await fetch(`${base}/health`)).status, 200);
+    ok = false;
+    const r = await fetch(`${base}/health`);
+    assert.equal(r.status, 503);
+    assert.deepEqual(await r.json(), { ok: false, jobs: 'stalled', stalled: 2 });
+  });
+});

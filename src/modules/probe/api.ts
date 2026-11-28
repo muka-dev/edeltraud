@@ -4,7 +4,7 @@ import { allowedOrigin, type EndpointEntry, type EndpointsData } from '../analyz
 
 const MAX_BYTES = 64 * 1024;
 // Anything that could change state or cost money, even behind a GET.
-const DESTRUCTIVE = /logout|signout|delete|remove|reset|pay|checkout|webhook|send|invite|cron/i;
+export const DESTRUCTIVE = /logout|signout|delete|remove|reset|pay|checkout|webhook|send|invite|cron/i;
 const PERSONAL_FIELD = /e-?mail|phone|mobile|address|passw|token|secret|iban/i;
 const WRAPPER_KEYS = ['items', 'data', 'results', 'rows', 'records', 'users', 'list', 'profiles', 'accounts', 'orders', 'customers'];
 const SCALAR_DATA_KEYS = ['id', 'email', 'user'];

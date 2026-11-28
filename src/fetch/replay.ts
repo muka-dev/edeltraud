@@ -15,12 +15,15 @@ export interface FixtureResponse {
  */
 export class ReplayHttp implements Http {
   readonly log: string[] = [];
+  /** Every request as the module sent it (method, headers, body). */
+  readonly requests: HttpRequest[] = [];
   private site: Record<string, FixtureResponse>;
   constructor(site: Record<string, FixtureResponse>) {
     this.site = site;
   }
 
   async fetch(req: HttpRequest): Promise<HttpResponse> {
+    this.requests.push(req);
     const redirects: string[] = [];
     let url = req.url;
     for (let hop = 0; hop <= 5; hop++) {

@@ -115,7 +115,16 @@
     "jobs.ownership.valid": "Der Nachweis lässt sich bis {date} einrichten (14 Tage).",
     "jobs.failure.subject": "Zur Prüfung von {host}",
     "jobs.failure.title": "Die Prüfung von {host} ließ sich nicht automatisch abschließen",
-    "jobs.failure.body": "Das passiert gelegentlich. Markus Kosmal schaut sich den Fall persönlich an, in der Regel innerhalb eines Werktags. Eine weitere Aktion ist nicht nötig."
+    "jobs.failure.body": "Das passiert gelegentlich. Markus Kosmal schaut sich den Fall persönlich an, in der Regel innerhalb eines Werktags. Eine weitere Aktion ist nicht nötig.",
+    "report.fix.title": "Beheben lassen: Fix-Paket",
+    "report.fix.text": "Bis zu 5 kritische oder hohe Befunde aus diesem Bericht werden in bis zu 4 Stunden behoben, als Pull Request im Repository, mit anschließender Nachprüfung. 390 € netto, 2 Plätze pro Monat.",
+    "report.fix.cta": "Fix-Paket anfragen",
+    "jobs.watchOwnership.subject": "WatchDog für {host}: Nachweis für die monatliche Tiefenprüfung",
+    "jobs.watchOwnership.title": "WatchDog für {host} läuft – optional mit monatlicher Tiefenprüfung",
+    "jobs.watchOwnership.why": "Der WatchDog prüft ab sofort jede Woche passiv, also so, wie ein Besucher die App sieht. Einmal im Monat kann er zusätzlich aktiv prüfen (z. B. Datenbank-Regeln und Login-Bremse). Das ist nur bei Apps zulässig, die dem Auftraggeber gehören; dafür genügt ein DNS-Eintrag.",
+    "jobs.watchOwnership.dns": "DNS-TXT-Eintrag",
+    "jobs.watchOwnership.linkLabel": "Nachweis prüfen",
+    "jobs.watchOwnership.keep": "Der Eintrag bleibt bestehen, solange der WatchDog läuft: Vor jeder monatlichen Tiefenprüfung wird er still erneut geprüft. Ohne Eintrag bleibt es bei der wöchentlichen passiven Prüfung."
   },
   "findings": {
     "secrets.server-key": {
@@ -378,6 +387,11 @@
       "explain": "Die Antwort-Header nennen PHP {version}. Diese Versionsnummer liegt im Bereich der Lücken {advisories} (PHP2Shell, ohne Anmeldung ausnutzbare Codeausführung, CVSS 9.2). Behoben in PHP 8.5.12, 8.4.27, 8.3.36 und 8.2.35; für 8.1 und älter gibt es keine offizielle Korrektur. Linux-Distributionen übernehmen Korrekturen oft zurück (Backports) und behalten die alte Versionsnummer, etwa Ubuntu 24.04 mit 8.3.6. Die Versionsnummer legt die Lücke daher nur nahe; eine Korrektur kann von Hoster oder Distribution bereits eingespielt worden sein.",
       "fix": "1. Mit php -v und dem Sicherheitshinweis der Distribution bzw. des Hosters prüfen, ob die Korrektur enthalten ist. 2. Andernfalls auf PHP {fixed} oder neuer aktualisieren bzw. den Hoster darum bitten. 3. Die Versionsangabe in den Antwort-Headern ausblenden."
     },
+    "server.php-update": {
+      "title": "PHP {version}: Sicherheitsupdate vom 19.11.2026 fehlt (möglicherweise bereits gepatcht)",
+      "explain": "Die Antwort-Header nennen PHP {version}. Am 19.11.2026 wurden 18 Lücken in PHP behoben, darunter {advisories} (u. a. Request Smuggling in PHP-FPM und Codeausführung). Die schweren Lücken setzen eine nicht übliche Konfiguration voraus. Distributionen übernehmen Korrekturen oft zurück und behalten die alte Versionsnummer; die Versionsnummer legt das Update daher nur nahe.",
+      "fix": "1. Mit php -v und dem Sicherheitshinweis der Distribution bzw. des Hosters prüfen, ob das Update enthalten ist. 2. Andernfalls auf PHP {fixed} oder neuer aktualisieren bzw. den Hoster darum bitten. 3. Die Versionsangabe in den Antwort-Headern ausblenden."
+    },
     "server.php-eol": {
       "title": "PHP {version} wird nicht mehr gepflegt",
       "explain": "Die Antwort-Header nennen PHP {version}. Dieser Versionszweig erhält keine Sicherheitsupdates mehr; neu entdeckte Lücken werden nicht behoben. Distributionen pflegen manche Zweige länger, das lässt sich von außen nicht erkennen.",
@@ -543,6 +557,26 @@
       "explain": "Ein anonymer GET-Aufruf (ohne Cookies und ohne Zugangsdaten) an {path} lieferte JSON-Daten: {count} Einträge, Felder {fields}. Gespeichert wurden nur Anzahl und Feldnamen, keine Werte. Wenn die Daten nicht öffentlich sein sollen, kann jede Person mit der Adresse sie abrufen.",
       "fix": "1. Klären, ob die Schnittstelle öffentlich sein soll. 2. Falls nicht: serverseitig die Anmeldung prüfen und den Zugriff auf eigene Datensätze beschränken. 3. Nur die Felder ausliefern, die wirklich gebraucht werden. 4. Ohne Anmeldung erneut aufrufen und prüfen, dass 401 oder 403 kommt."
     },
+    "ai.edge-function-open": {
+      "title": "KI-Funktion {name} läuft ohne Anmeldung",
+      "explain": "Die Supabase Edge Function {name} sieht nach einem Aufruf eines Sprachmodells aus. Ein einzelner Aufruf mit nur dem öffentlichen Schlüssel der App (ohne Anmeldung) und absichtlich ungültigem Inhalt wurde nicht abgewiesen: Die Funktion lief bis zum Lesen der Eingabe. Ein echter Prompt wurde nicht gesendet, gespeichert wurde nur der Statuscode. Damit kann vermutlich jede Person die Funktion beliebig oft aufrufen und das LLM-Budget der App verbrauchen (Kostenmissbrauch).",
+      "fix": "1. In der Funktion den JWT prüfen und mit auth.getUser() sicherstellen, dass eine angemeldete Person anfragt; sonst 401 zurückgeben. Der öffentliche anon-Schlüssel allein ist keine Anmeldung. 2. Anfragen pro Person begrenzen (Rate Limit). 3. Beim LLM-Anbieter ein Ausgabenlimit setzen. 4. Ohne Anmeldung erneut aufrufen und prüfen, dass 401 kommt."
+    },
+    "ratelimit.auth.supabase": {
+      "title": "Anmeldung begrenzt Fehlversuche nicht (Supabase)",
+      "explain": "An die Supabase-Anmeldung mit E-Mail und Passwort gingen {attempts} fehlgeschlagene Anmeldeversuche mit derselben erfundenen Adresse (Endung example.invalid, kein echtes Konto) und kurzen Pausen. Keiner wurde mit HTTP 429 gebremst. Gespeichert wurden nur Statuscodes und Anzahlen. Damit lassen sich Passwörter vermutlich in großer Zahl durchprobieren. Supabase begrenzt teils pro IP über ein längeres Zeitfenster; diese Grenzen sind je Projekt im Dashboard einstellbar und von außen nicht vollständig sichtbar.",
+      "fix": "1. Im Supabase-Dashboard unter Authentication → Rate Limits die Grenze für Anmeldungen senken. 2. CAPTCHA-Schutz (hCaptcha oder Cloudflare Turnstile) für die Anmeldung aktivieren und im Formular einbinden. 3. Erneut prüfen, dass wiederholte Fehlversuche mit 429 beantwortet werden."
+    },
+    "ratelimit.auth.firebase": {
+      "title": "Anmeldung begrenzt Fehlversuche nicht (Firebase)",
+      "explain": "An die Firebase-Anmeldung (signInWithPassword) gingen {attempts} fehlgeschlagene Anmeldeversuche mit derselben erfundenen Adresse (Endung example.invalid, kein echtes Konto) und kurzen Pausen. Keiner wurde gebremst (kein HTTP 429, kein TOO_MANY_ATTEMPTS_TRY_LATER). Gespeichert wurden nur Statuscodes und Anzahlen. Damit lassen sich Passwörter vermutlich in großer Zahl durchprobieren. Firebase begrenzt teils pro IP über ein längeres Zeitfenster, das ist von außen nicht vollständig sichtbar.",
+      "fix": "1. Firebase App Check mit reCAPTCHA Enterprise für Authentication aktivieren und durchsetzen. 2. In Authentication → Einstellungen den Schutz vor E-Mail-Enumeration einschalten. 3. Bei Bedarf reCAPTCHA Enterprise für die Passwort-Anmeldung einrichten. 4. Erneut prüfen, dass wiederholte Fehlversuche gebremst werden."
+    },
+    "auth.enumeration": {
+      "title": "Anmeldung verrät, ob ein Konto existiert (Firebase)",
+      "explain": "Ein einzelner Anmeldeversuch mit einer erfundenen Adresse (Endung example.invalid) wurde von Firebase mit EMAIL_NOT_FOUND beantwortet statt mit der einheitlichen Meldung INVALID_LOGIN_CREDENTIALS. Der Schutz vor E-Mail-Enumeration ist damit ausgeschaltet: Jede Person kann prüfen, welche E-Mail-Adressen ein Konto in der App haben, und gezielt Passwörter oder Phishing ansetzen. Gespeichert wurde nur der Fehlercode.",
+      "fix": "1. In der Firebase-Konsole unter Authentication → Einstellungen → Benutzeraktionen den Schutz vor E-Mail-Enumeration aktivieren. 2. Fehlermeldungen in der App einheitlich formulieren („E-Mail oder Passwort falsch“). 3. App Check mit reCAPTCHA Enterprise aktivieren. 4. Erneut prüfen, dass eine unbekannte Adresse INVALID_LOGIN_CREDENTIALS ergibt."
+    },
     "auth.client-only": {
       "title": "Zugriffsschutz für Admin-Bereiche scheint nur im Browser zu liegen",
       "explain": "Im Frontend-Code stehen Admin-Routen ({routes}) zusammen mit Rollenprüfungen wie role === \"admin\", aber keine Schnittstellen unter /api/admin und keine Edge Functions mit „admin“ im Namen. Das ist ein Hinweis, kein Beweis. UI auszublenden schützt keine Daten: Wer die Schnittstellen direkt aufruft, umgeht jede Prüfung im Browser. Rechte müssen im Server oder in der Datenbank (Row Level Security) durchgesetzt werden.",
@@ -562,6 +596,126 @@
       "title": "CORS spiegelt beliebige Herkunft ({path})",
       "explain": "Die Antwort von {path} spiegelte die Herkunft einer fremden, erfundenen Domain in Access-Control-Allow-Origin, ohne Anmeldedaten zu erlauben. Bei öffentlichen Daten ist das oft gewollt; bei nicht öffentlichen Daten sollte die Liste erlaubter Herkünfte begrenzt sein.",
       "fix": "1. Prüfen, ob die Schnittstelle von beliebigen Webseiten aus lesbar sein soll. 2. Falls nicht: feste Liste eigener Origins verwenden. 3. Erneut mit einer fremden Origin prüfen."
+    },
+    "a11y.no-lang": {
+      "title": "Sprache der Seite nicht angegeben",
+      "explain": "Auf {pages} Seite(n) fehlt das Attribut lang am <html>-Element oder es ist leer. Screenreader wählen damit Aussprache und Sprachausgabe; ohne Angabe wird der Text oft falsch vorgelesen. Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. Am <html>-Element die Sprache setzen, z. B. <html lang=\"de\">. 2. Bei mehrsprachigen Apps den Wert je Sprache setzen. 3. Abschnitte in anderer Sprache mit eigenem lang markieren."
+    },
+    "a11y.img-alt": {
+      "title": "{count} Bilder ohne Alternativtext",
+      "explain": "{count} Bilder auf {pages} Seite(n) haben kein alt-Attribut, z. B. {sample}. Screenreader lesen dann den Dateinamen oder nichts vor. Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. Für Bilder mit Inhalt einen kurzen alt-Text schreiben, der beschreibt, was das Bild zeigt oder bewirkt. 2. Rein dekorative Bilder mit alt=\"\" kennzeichnen. 3. Bei Komponenten (z. B. Image in Next.js) alt immer übergeben."
+    },
+    "a11y.input-label": {
+      "title": "{count} Formularfelder ohne Beschriftung",
+      "explain": "{count} Formularfelder auf {pages} Seite(n) haben kein zugeordnetes Label, z. B. {sample}. Ein Platzhalter (placeholder) ersetzt kein Label: er verschwindet bei der Eingabe und wird nicht zuverlässig vorgelesen. Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. Jedem Feld ein <label for=\"id\"> zuordnen oder das Feld in <label> einschließen. 2. Wo kein sichtbares Label passt, aria-label setzen. 3. Mit Tastatur und Screenreader prüfen, dass jedes Feld angesagt wird."
+    },
+    "a11y.control-name": {
+      "title": "{count} Schaltflächen oder Links ohne zugänglichen Namen",
+      "explain": "{count} Schaltflächen oder Links auf {pages} Seite(n) haben weder Text noch aria-label oder title, z. B. {sample}. Häufig sind das Symbol-Schaltflächen (Menü, Schließen, Social Icons). Screenreader sagen dann nur \"Schaltfläche\" oder die Adresse an. Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. Symbol-Schaltflächen mit aria-label versehen, z. B. aria-label=\"Menü öffnen\". 2. Bei Bildern in Links einen alt-Text setzen. 3. Rein dekorative Icons mit aria-hidden=\"true\" ausblenden."
+    },
+    "a11y.zoom-blocked": {
+      "title": "Vergrößern auf Mobilgeräten gesperrt",
+      "explain": "Das Meta-Tag viewport verhindert das Vergrößern ({sample}). Menschen mit Sehbeeinträchtigung können die Seite auf dem Smartphone dann nicht zoomen. Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. user-scalable=no und maximum-scale entfernen. 2. Empfohlen: <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">. 3. Auf dem Smartphone prüfen, dass Zoomen mit zwei Fingern funktioniert."
+    },
+    "a11y.no-title": {
+      "title": "Seite ohne Titel",
+      "explain": "Auf {pages} Seite(n) fehlt ein <title> oder er ist leer. Der Titel ist das Erste, was Screenreader ansagen, und erscheint im Browser-Tab. Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. Jeder Seite einen eindeutigen <title> geben, z. B. \"Preise – Appname\". 2. Bei Single-Page-Apps den Titel je Route setzen."
+    },
+    "a11y.no-statement": {
+      "title": "Keine Erklärung zur Barrierefreiheit verlinkt",
+      "explain": "Es wurde kein Link auf eine Erklärung zur Barrierefreiheit gefunden (z. B. \"Barrierefreiheit\" oder /barrierefreiheit). Fällt ein Angebot unter das BFSG (seit 28.06.2025, viele Dienste an Verbraucherinnen und Verbraucher), werden Informationen zur Barrierefreiheit erwartet. Ob das BFSG gilt, hängt vom Angebot und der Unternehmensgröße ab; das ist ein Hinweis, keine rechtliche Bewertung.",
+      "fix": "1. Klären, ob das Angebot unter das BFSG fällt. 2. Falls ja: eine Seite mit Informationen zur Barrierefreiheit anlegen (Stand, bekannte Einschränkungen, Kontakt für Rückmeldungen). 3. Im Footer jeder Seite verlinken."
+    },
+    "seo.title-missing": {
+      "title": "Startseite ohne Titel",
+      "explain": "Im ausgelieferten HTML der Startseite fehlt ein <title> oder er ist leer. Suchmaschinen und Link-Vorschauen zeigen dann die Adresse oder einen selbst gewählten Text.",
+      "fix": "1. Einen kurzen, eindeutigen <title> mit Name und Nutzen setzen (bis etwa 60 Zeichen). 2. Bei Single-Page-Apps den Titel schon im ausgelieferten index.html eintragen."
+    },
+    "seo.title-long": {
+      "title": "Titel der Startseite zu lang ({length} Zeichen)",
+      "explain": "Der <title> der Startseite hat {length} Zeichen. Suchmaschinen kürzen ab etwa {max} Zeichen; das Ende ist dann nicht zu sehen.",
+      "fix": "1. Den Titel auf höchstens {max} Zeichen kürzen. 2. Das Wichtigste (Name, Nutzen) an den Anfang stellen."
+    },
+    "seo.description-missing": {
+      "title": "Keine Meta-Beschreibung",
+      "explain": "Die Startseite hat kein <meta name=\"description\">. Suchmaschinen und Link-Vorschauen wählen dann selbst einen Textausschnitt, oft unpassend.",
+      "fix": "1. Eine Beschreibung von etwa 120–160 Zeichen schreiben, die sagt, was die App kann. 2. Als <meta name=\"description\" content=\"…\"> im <head> eintragen."
+    },
+    "seo.canonical-missing": {
+      "title": "Keine kanonische Adresse",
+      "explain": "Die Startseite gibt keine kanonische Adresse an (<link rel=\"canonical\">). Ist die Seite unter mehreren Adressen erreichbar (mit/ohne www, Plattform-Domain wie *.vercel.app), können Suchmaschinen die falsche Adresse anzeigen.",
+      "fix": "1. Im <head> <link rel=\"canonical\" href=\"https://eigene-domain/\"> setzen. 2. Auf der Plattform-Domain auf die eigene Domain weiterleiten."
+    },
+    "seo.noindex": {
+      "title": "Startseite für Suchmaschinen gesperrt (noindex)",
+      "explain": "Die Startseite ist über {source} als noindex markiert. Suchmaschinen nehmen sie dann nicht auf. Auf Test- und Vorschau-Umgebungen ist das richtig, auf der Produktion meist ein Versehen – gewollt?",
+      "fix": "1. Prüfen, ob die Seite gefunden werden soll. 2. Falls ja: noindex aus dem Meta-Tag robots bzw. dem Header X-Robots-Tag entfernen (oft eine Einstellung der Plattform oder ein Rest aus der Entwicklung). 3. Danach in der Search Console erneut einreichen."
+    },
+    "seo.h1-missing": {
+      "title": "Keine Hauptüberschrift (h1)",
+      "explain": "Die Startseite hat keine <h1>. Die Hauptüberschrift hilft Suchmaschinen und Screenreadern, das Thema der Seite zu erkennen.",
+      "fix": "1. Genau eine <h1> mit dem Kernnutzen setzen. 2. Weitere Überschriften als <h2>, <h3> gliedern."
+    },
+    "seo.h1-multiple": {
+      "title": "Mehrere Hauptüberschriften ({count} × h1)",
+      "explain": "Die Startseite hat {count} <h1>-Überschriften. Üblich ist eine Hauptüberschrift; mehrere machen das Thema der Seite unklarer.",
+      "fix": "1. Eine <h1> behalten. 2. Die übrigen in <h2> oder <h3> umwandeln (Gestaltung per CSS beibehalten)."
+    },
+    "seo.og-missing": {
+      "title": "Open-Graph-Angaben fehlen: {list}",
+      "explain": "Der Startseite fehlen die Open-Graph-Angaben {list}. Beim Teilen auf LinkedIn, WhatsApp oder Slack erscheint dann keine oder eine zufällige Vorschau.",
+      "fix": "1. Im <head> <meta property=\"og:title\"> und <meta property=\"og:image\"> (Bild etwa 1200 × 630 Pixel, absolute Adresse) eintragen. 2. Mit einem Vorschau-Werkzeug der Plattformen prüfen."
+    },
+    "ops.soft-404": {
+      "title": "Nicht vorhandene Adressen antworten mit 200 (Soft 404)",
+      "explain": "Erfundene Adressen ({paths}) antworten mit Status {status} und einer HTML-Seite statt mit 404. Suchmaschinen nehmen solche Seiten als doppelte Inhalte auf, Monitoring erkennt kaputte Links nicht, und Programme, die eine API erwarten, erhalten HTML.",
+      "fix": "1. Für unbekannte Routen eine 404-Seite mit Status 404 ausliefern (bei Single-Page-Apps: Fallback nur für echte Routen, z. B. per Server-Konfiguration oder Plattform-Einstellung). 2. Unter /api/ unbekannte Pfade immer mit 404 und JSON beantworten. 3. Mit einer erfundenen Adresse prüfen."
+    },
+    "a11y.contrast": {
+      "title": "Zu geringer Farbkontrast ({count} Elemente)",
+      "explain": "{count} Elemente auf der Startseite haben zu wenig Kontrast zwischen Text und Hintergrund (WCAG 1.4.3), z. B. {sample}. Menschen mit Sehschwäche und alle bei Sonnenlicht können den Text schlecht lesen. Geprüft mit axe-core im gerenderten DOM. Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. Textfarbe oder Hintergrund anpassen: mindestens 4,5:1, bei großer Schrift 3:1. 2. Besonders hellgraue Hinweise, Platzhalter und Text auf Bildern prüfen. 3. Mit einem Kontrastrechner oder den Entwicklerwerkzeugen nachmessen."
+    },
+    "a11y.axe": {
+      "title": "Barrierefreiheit: Regel {rule} verletzt ({count} Elemente)",
+      "explain": "axe-core meldet für die Regel {rule} {count} betroffene Elemente auf der Startseite, z. B. {sample}. Beschreibung und Beispiele der Regel: {link} Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt seit 28.06.2025 für viele Angebote an Verbraucherinnen und Verbraucher. Automatisch geprüft wird nur ein Ausschnitt; das ist ein Hinweis, keine Aussage über die Erfüllung gesetzlicher Anforderungen.",
+      "fix": "1. Die Regelbeschreibung unter {link} lesen. 2. Die genannten Elemente korrigieren. 3. Erneut prüfen, z. B. mit der Browser-Erweiterung axe DevTools."
+    },
+    "perf.weight-total": {
+      "title": "Startseite lädt {size}",
+      "explain": "Beim ersten Aufruf überträgt die Startseite insgesamt {size}. Auf Mobilfunk dauert das spürbar und kostet Datenvolumen. Gemessen wurde ein einzelner Ladevorgang im Labor (Desktop); echte Werte von Besucherinnen und Besuchern können abweichen.",
+      "fix": "1. Bilder verkleinern und als WebP/AVIF ausliefern. 2. Nicht benötigte Skripte und Schriften entfernen oder später laden. 3. Kompression (gzip/brotli) und Caching prüfen."
+    },
+    "perf.weight-js": {
+      "title": "{size} JavaScript beim ersten Aufruf",
+      "explain": "Die Startseite lädt {size} JavaScript (übertragen, komprimiert). Das Gerät muss alles laden und ausführen, bevor die Seite reagiert; auf einfachen Smartphones dauert das Sekunden. Gemessen wurde ein einzelner Ladevorgang im Labor (Desktop); echte Werte von Besucherinnen und Besuchern können abweichen.",
+      "fix": "1. Mit einem Bundle-Analyzer die größten Pakete finden. 2. Selten genutzte Teile per dynamic import nachladen. 3. Große Bibliotheken durch kleinere ersetzen oder nur benötigte Teile importieren."
+    },
+    "perf.weight-image": {
+      "title": "{count} sehr große Bilder",
+      "explain": "{count} Bilder auf der Startseite sind größer als 500 KB, z. B. {sample}.",
+      "fix": "1. Bilder auf die angezeigte Größe verkleinern. 2. Als WebP oder AVIF ausliefern. 3. srcset und loading=\"lazy\" für Bilder außerhalb des ersten Bildschirms nutzen."
+    },
+    "perf.lcp": {
+      "title": "Hauptinhalt erscheint spät (LCP {value})",
+      "explain": "Das größte sichtbare Element war nach {value} da (gut: bis {limit}). Besucherinnen und Besucher sehen so lange eine leere oder unfertige Seite. Gemessen wurde ein einzelner Ladevorgang im Labor (Desktop); echte Werte von Besucherinnen und Besuchern können abweichen.",
+      "fix": "1. Das Hauptbild bzw. die Hauptüberschrift früh laden (preload, kein Lazy Loading für das erste Bild). 2. Render-blockierende Skripte und Schriften reduzieren. 3. Bei Single-Page-Apps Inhalte serverseitig oder statisch vorrendern."
+    },
+    "perf.cls": {
+      "title": "Layout springt beim Laden (CLS {value})",
+      "explain": "Beim Laden verschieben sich Inhalte sichtbar (CLS {value}, gut: bis {limit}). Das führt zu Fehlklicks. Gemessen wurde ein einzelner Ladevorgang im Labor (Desktop); echte Werte von Besucherinnen und Besuchern können abweichen.",
+      "fix": "1. Bildern und Einbettungen feste Breite und Höhe (oder aspect-ratio) geben. 2. Platz für Banner und nachgeladene Inhalte reservieren. 3. Schriften mit font-display und passender Ersatzschrift laden."
+    },
+    "perf.tbt": {
+      "title": "Seite reagiert verzögert (TBT {value})",
+      "explain": "Lange Skriptaufgaben blockieren den Browser insgesamt {value} (gut: bis {limit}). Klicks und Eingaben reagieren in dieser Zeit verzögert. Gemessen wurde ein einzelner Ladevorgang im Labor (Desktop); echte Werte von Besucherinnen und Besuchern können abweichen.",
+      "fix": "1. Große Skripte aufteilen und später laden. 2. Aufwändige Arbeit beim Start vermeiden oder in Web Worker verlagern. 3. Drittanbieter-Skripte prüfen und reduzieren."
     }
   }
 }

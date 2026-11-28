@@ -63,11 +63,13 @@ test('database matching', () => {
   assert.equal(matchVulnerabilities('axios', '1.6.0'), null);
   assert.equal(matchVulnerabilities('axios', '0.30.0'), null);
   assert.equal(matchVulnerabilities('axios', '1.5.1')!.fixed, '1.6.0');
-  assert.equal(matchVulnerabilities('nextjs', '14.2.25'), null);
-  assert.equal(matchVulnerabilities('nextjs', '13.0.0')!.severity, 'high');
+  assert.equal(matchVulnerabilities('nextjs', '14.2.25')!.fixed, '15.5.28', 'AVIF/SVG RCE reach back to 10.0.0');
+  assert.equal(matchVulnerabilities('nextjs', '13.0.0')!.severity, 'critical');
   assert.equal(matchVulnerabilities('nextjs', '15.1.0')!.severity, 'critical');
   assert.equal(matchVulnerabilities('moment', '2.29.4'), null);
-  assert.equal(matchVulnerabilities('lodash', '4.17.20')!.severity, 'medium');
+  assert.equal(matchVulnerabilities('lodash', '4.17.20')!.severity, 'high');
+  assert.deepEqual(matchVulnerabilities('lodash', '4.17.22'), { severity: 'medium', ids: ['CVE-2025-13465'], fixed: '4.17.23' });
+  assert.equal(matchVulnerabilities('lodash', '4.17.23'), null);
 });
 
 const plan = parsePlan({

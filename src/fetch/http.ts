@@ -66,7 +66,12 @@ export class LiveHttp implements Http {
         u,
         {
           method: req.method ?? 'GET',
-          headers: { 'user-agent': USER_AGENT, 'accept-encoding': 'gzip, br, deflate', ...req.headers },
+          headers: {
+            'user-agent': USER_AGENT,
+            'accept-encoding': 'gzip, br, deflate',
+            ...(req.body !== undefined ? { 'content-length': String(Buffer.byteLength(req.body)) } : {}),
+            ...req.headers,
+          },
           lookup: safeLookup,
           timeout,
         },
@@ -111,7 +116,7 @@ export class LiveHttp implements Http {
       );
       r.on('timeout', () => r.destroy(new Error('timeout')));
       r.on('error', reject);
-      r.end();
+      r.end(req.body);
     });
   }
 }

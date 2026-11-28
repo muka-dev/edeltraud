@@ -49,6 +49,11 @@ nennt es den Befehl zum Zurückrollen, z. B.:
 sudo /opt/edeltraud/ai-check/deploy/update.sh 1a2b3c4
 ```
 
+Das Compose-Projekt heißt fest `edeltraud`, die Container also `edeltraud-api-1`,
+`edeltraud-jobs-1` usw. (bis Ende November 2026 hießen sie nach dem Ordner
+`deploy-api-1`). Beim ersten Lauf nach der Umstellung entfernt `update.sh` die alten
+`deploy-*`-Container, die API ist dabei wenige Sekunden weg.
+
 Logs ansehen:
 
 ```bash
@@ -85,12 +90,18 @@ docker compose -f deploy/compose.yaml up -d --build
 curl -s http://127.0.0.1:8787/health
 ```
 
+`/health` antwortet 200 `{"ok":true}`. Mit `JOBS_DIR` meldet es zusätzlich
+einen hängenden Auftrags-Worker: 503 `{"ok":false,"jobs":"stalled",…}`, sobald
+ein fälliger Auftrag länger als 2 h wartet (`HEALTH_MAX_QUEUE_AGE_MS`). Von
+außen überwachen, z. B. im bestehenden GitHub-Actions-Lauf:
+`curl -fsS https://scan.m-ko.de/health` (schlägt bei 503 fehl).
+
 ## 3. Proxy
 
 Wichtig für die Grenzen pro Besucher: Der Proxy muss die Adresse des Besuchers
 in `X-Forwarded-For` **anhängen** oder setzen. Die API nimmt den letzten Eintrag.
 
-Caddy direkt auf dem Server (Paket, systemd):
+Caddy direkt auf dem Server (Paket, systemd), das Netz einmalig anlegen (`sudo docker network create proxy`):
 
 ```
 scan.m-ko.de {
@@ -99,9 +110,11 @@ scan.m-ko.de {
 ```
 
 Caddy in einem eigenen Docker-Container: Dort ist `127.0.0.1` der
-Caddy-Container selbst (Folge: 502). Stattdessen in `/opt/edeltraud/api.env`
-`PROXY_NETWORK=<Docker-Netz von Caddy>` eintragen; `update.sh` hängt die API
-dann unter dem Namen `edeltraud-api` in dieses Netz:
+Caddy-Container selbst (Folge: 502). `compose.yaml` hängt die API deshalb fest
+unter dem Namen `edeltraud-api` in das Docker-Netz von Caddy (Standard: `proxy`).
+Das bleibt auch bei `docker compose up` ohne `update.sh` erhalten. Heißt das Netz
+anders, in `/opt/edeltraud/api.env` `PROXY_NETWORK=<Netz>` eintragen und bei
+Befehlen von Hand `PROXY_NETWORK=<Netz>` voranstellen:
 
 ```
 scan.m-ko.de {

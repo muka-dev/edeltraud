@@ -1,0 +1,29 @@
+# Mirrors wiki/ into the GitHub wiki. The wiki must exist first:
+# Settings > Features > Wikis, then create any first page once in the browser.
+name: Wiki sync
+on:
+  push:
+    branches: [main]
+    paths: ['wiki/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Push wiki/ to the wiki repository
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" wiki-repo || {
+            echo "::warning::Wiki not initialised yet (create a first page in the browser)."; exit 0; }
+          rsync -a --delete --exclude .git wiki/ wiki-repo/
+          cd wiki-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "Wiki up to date"; exit 0; }
+          git commit -m "Sync from ${GITHUB_SHA::7}"
+          git push

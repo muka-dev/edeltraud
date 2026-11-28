@@ -1,5 +1,6 @@
 import { finding, mask } from '../../core/finding.ts';
 import type { CheckModule, Finding, Severity } from '../../core/types.ts';
+import type { SourceMapProbe } from '../collect/sourcemaps.ts';
 import { decodeJwtPayload, lineOf, type BundleData, type PageData } from '../util.ts';
 
 interface Pattern {
@@ -67,16 +68,30 @@ export function scanText(src: Source): { kind: string; provider: string; severit
   return hits;
 }
 
-/** Finds secret keys in shipped JavaScript and HTML. Evidence is always masked. */
+/** Original sources inside downloaded source maps (sourcesContent); unreadable maps give nothing. */
+function mapSources(p: SourceMapProbe): Source[] {
+  if (!p.isSourceMap || !p.content) return [];
+  try {
+    const map = JSON.parse(p.content) as { sources?: unknown[]; sourcesContent?: unknown[] };
+    const names = Array.isArray(map.sources) ? map.sources : [];
+    return (Array.isArray(map.sourcesContent) ? map.sourcesContent : []).flatMap((text, i) =>
+      typeof text === 'string' ? [{ url: `${p.url} → ${typeof names[i] === 'string' ? names[i] : `#${i}`}`, text }] : [],
+    );
+  } catch {
+    return [];
+  }
+}
+
+/** Finds secret keys in shipped JavaScript, HTML (start page and crawled pages) and the sources inside public source maps. Evidence is always masked. */
 export const secretsFrontend: CheckModule = {
   manifest: {
     id: 'secrets.frontend',
-    version: '0.1.0',
+    version: '0.2.0',
     kind: 'analyzer',
     mode: 'passive',
     category: 'security',
     requires: ['artifact:page'],
-    uses: ['artifact:js-bundle'],
+    uses: ['artifact:js-bundle', 'artifact:sourcemap', 'artifact:subpage'],
     provides: [],
     params: {},
     budget: {},
@@ -85,7 +100,9 @@ export const secretsFrontend: CheckModule = {
     const page = ctx.artifacts.list('page')[0]!.data as PageData;
     const sources: Source[] = [
       { url: page.finalUrl, text: page.html },
+      ...ctx.artifacts.list('subpage').map((a) => ({ url: (a.data as PageData).finalUrl, text: (a.data as PageData).html })),
       ...ctx.artifacts.list('js-bundle').map((a) => ({ url: (a.data as BundleData).url, text: (a.data as BundleData).code })),
+      ...ctx.artifacts.list('sourcemap').flatMap((a) => mapSources(a.data as SourceMapProbe)),
     ];
     const findings: Finding[] = [];
     const seen = new Set<string>();

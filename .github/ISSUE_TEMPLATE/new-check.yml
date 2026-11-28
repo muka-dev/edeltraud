@@ -1,0 +1,15 @@
+name: New check
+description: Propose a check for a typical flaw in AI-built apps.
+labels: [new-check]
+body:
+  - type: textarea
+    id: flaw
+    attributes: { label: Which flaw, description: What goes wrong, which tools (Lovable, Cursor, Bolt, v0 …) tend to produce it. }
+    validations: { required: true }
+  - type: dropdown
+    id: mode
+    attributes: { label: Mode, options: [Passive (reads public content only), Active (needs proof of ownership)] }
+    validations: { required: true }
+  - type: textarea
+    id: detect
+    attributes: { label: How to detect it, description: Signals, false-positive risks, sources. }

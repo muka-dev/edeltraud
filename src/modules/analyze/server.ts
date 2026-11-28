@@ -54,6 +54,22 @@ export const depsServer: CheckModule = {
           }),
         );
       }
+      const updateIn = db.update.fixed[branch];
+      if (!affected && updateIn && compareVersions(version, updateIn) < 0) {
+        // Critical issues of this round need a non-default configuration: medium, version only a hint.
+        out.push(
+          finding(m, {
+            kind: 'php-update',
+            severity: 'medium',
+            confidence: 'possible',
+            location: loc,
+            evidence: `PHP/${version}`,
+            messageKey: 'server.php-update',
+            vars: { version, advisories: db.update.advisories.join(', '), fixed: updateIn },
+            discriminator: version,
+          }),
+        );
+      }
       const eol = db.eol[branch];
       if (eol) {
         out.push(finding(m, { kind: 'php-eol', severity: 'medium', confidence: 'likely', location: loc, evidence: `PHP/${version}`, messageKey: 'server.php-eol', vars: { version }, discriminator: version }));
