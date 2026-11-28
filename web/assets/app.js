@@ -21,6 +21,9 @@ const T = {
     ctaReport: 'Vollständiger Bericht mit Schritten zur Behebung und fertigen Prompts',
     ctaReportBtn: 'Bericht kaufen · 49 €',
     ctaWatchBtn: 'WatchDog · 19 €/Monat',
+    ctaDeepBtn: 'Tiefenprüfung kaufen · 149 €',
+    ctaWatchYBtn: 'WatchDog · 190 €/Jahr',
+    orderHint: 'Zuerst die Adresse der App prüfen. Danach geht es direkt zur Bestellung.',
     ctaFallbackBtn: 'Bericht anfragen',
     buying: 'Bezahlseite wird vorbereitet …',
     buyError: 'Die Bezahlseite ließ sich gerade nicht öffnen. Bitte später erneut versuchen.',
@@ -57,6 +60,9 @@ const T = {
     ctaReport: 'Full report with steps to fix and ready-made prompts',
     ctaReportBtn: 'Buy report · €49',
     ctaWatchBtn: 'WatchDog · €19/month',
+    ctaDeepBtn: 'Buy deep check · €149',
+    ctaWatchYBtn: 'WatchDog · €190/year',
+    orderHint: 'First check the address of the app. The order follows right after.',
     ctaFallbackBtn: 'Request report',
     buying: 'Preparing the payment page …',
     buyError: 'The payment page could not be opened right now. Please try again later.',
@@ -93,6 +99,9 @@ const T = {
     ctaReport: 'Relatório completo com passos de correção e prompts prontos',
     ctaReportBtn: 'Comprar relatório · 49 €',
     ctaWatchBtn: 'WatchDog · 19 €/mês',
+    ctaDeepBtn: 'Comprar verificação aprofundada · 149 €',
+    ctaWatchYBtn: 'WatchDog · 190 €/ano',
+    orderHint: 'Primeiro verifique o endereço da app. A encomenda segue logo a seguir.',
     ctaFallbackBtn: 'Pedir relatório',
     buying: 'A preparar a página de pagamento …',
     buyError: 'Não foi possível abrir a página de pagamento. Tente novamente mais tarde.',
@@ -125,6 +134,12 @@ const statusBar = $('status-bar');
 const errorBox = $('error');
 const resultBox = $('result');
 const resultBody = $('result-body');
+
+/** Product chosen on m-ko.de/check/ (?order=…): offered first after the free check. */
+const ORDER = (() => {
+  const o = new URLSearchParams(window.location.search).get('order');
+  return ['report', 'deep', 'watchdog', 'watchdog-y'].includes(o) ? o : null;
+})();
 
 function lang() {
   const l = root.getAttribute('data-lang');
@@ -368,7 +383,10 @@ export function renderResult(p) {
 
   const ctas = el('div', null, 'ctas');
   const c1 = el('div', null, 'cta');
-  c1.append(el('p', tx.ctaReport), buyButton(tx.ctaReportBtn, p.target, 'report', 'btn'), buyButton(tx.ctaWatchBtn, p.target, 'watchdog', 'btn btn--ghost'));
+  const label = { report: tx.ctaReportBtn, deep: tx.ctaDeepBtn, watchdog: tx.ctaWatchBtn, 'watchdog-y': tx.ctaWatchYBtn };
+  const offer = ORDER && ORDER !== 'report' && ORDER !== 'watchdog' ? ['report', ORDER, 'watchdog'] : ['report', 'watchdog'];
+  if (ORDER) offer.sort((a, b) => (b === ORDER) - (a === ORDER));
+  c1.append(el('p', tx.ctaReport), ...offer.map((k, i) => buyButton(label[k], p.target, k, i === 0 ? 'btn' : 'btn btn--ghost')));
   const c2 = el('div', null, 'cta');
   c2.append(el('p', tx.ctaHuman), ctaLink(tx.ctaHumanBtn, 'https://m-ko.de/check/', 'btn btn--ghost'));
   ctas.append(c1, c2);
@@ -416,3 +434,14 @@ form.addEventListener('submit', (ev) => {
   if (!url) { showError(t().empty); input.focus(); return; }
   run(url);
 });
+
+if (ORDER) {
+  // One span per language, switched by the page's lang CSS like the static text.
+  const hint = el('p', null, 'consent order-hint');
+  for (const l of ['de', 'en', 'pt']) {
+    const s = el('span', T[l].orderHint);
+    s.setAttribute('lang', l);
+    hint.append(s);
+  }
+  form.after(hint);
+}

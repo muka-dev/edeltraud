@@ -5,12 +5,13 @@ limits: { totalMs: 300000, requests: 800, browser: true }
 modules:
   - collect.page
   - collect.bundles: { maxBundles: 120, followLazyChunks: true }
-  - collect.sourcemaps: { headOnly: true, maxMaps: 40 }
+  - collect.sourcemaps: { headOnly: false, maxMaps: 40 }
   - collect.tls
-  - collect.render: { waitMs: 4000, maxRequests: 300 }
+  - collect.render: { waitMs: 4000, maxRequests: 300, audit: true }
   - collect.dns
   - collect.legal
   - collect.wellknown
+  - collect.crawl: { maxPages: 10 }
   - collect.errorpages
   - stack.detect
   - secrets.frontend
@@ -19,6 +20,13 @@ modules:
   - errors.verbose
   - privacy.legal-pages
   - ops.errors-console
+  - a11y.basics
+  - a11y.statement
+  - seo.basics
+  - ops.404
+  - a11y.axe
+  - perf.weight
+  - perf.vitals
   - mixed.content
   - sri.missing
   - privacy.third-party
@@ -39,6 +47,9 @@ modules:
   - endpoints.discovered
   - auth.client-only
   - api.unauth: { maxEndpoints: 20 }
+  - ai.edge-function-open: { maxFunctions: 5 }
+  - auth.enumeration
+  - ratelimit.auth: { maxAttempts: 10, pauseMs: 300 }
   - cors.policy: { maxEndpoints: 5 }
   - sourcemaps.exposed
   - supabase.config

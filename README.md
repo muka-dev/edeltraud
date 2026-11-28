@@ -1,5 +1,13 @@
 # EDEL.TRAUD.AI
 
+[![CI](https://github.com/muka-dev/edeltraud/actions/workflows/ci.yml/badge.svg)](https://github.com/muka-dev/edeltraud/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/muka-dev/edeltraud/actions/workflows/codeql.yml/badge.svg)](https://github.com/muka-dev/edeltraud/actions/workflows/codeql.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://muka-dev.github.io/edeltraud/)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
+![Node.js ≥ 22.18](https://img.shields.io/badge/node-%E2%89%A5%2022.18-339933)
+
+Dokumentation (englisch): https://muka-dev.github.io/edeltraud/ · Gehosteter Dienst: https://scan.m-ko.de
+
 *Trau, schau, wem.* Edeltraud findet typische Fehler in Apps, die mit
 Lovable, Cursor, Claude Code, Bolt, v0 und ähnlichen Werkzeugen gebaut
 wurden. Eigenständige Komponente (CLI, Bibliothek, HTTP-API), die unter

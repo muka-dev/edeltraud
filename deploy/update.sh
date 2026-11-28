@@ -29,22 +29,26 @@ echo "deploying $after (was $before)"
 "${COMPOSE[@]}" build api
 "${COMPOSE[@]}" --profile jobs --profile watch build jobs watch
 
+# compose.yaml puts the API into the proxy's Docker network (alias "edeltraud-api"), so a
+# recreate never drops it. PROXY_NETWORK in api.env names that network (default: proxy).
+PROXY_NETWORK="$( (grep -E '^PROXY_NETWORK=' "$ENV_FILE" || true) | tail -1 | cut -d= -f2- | tr -d '"'"'"' ')"
+export PROXY_NETWORK="${PROXY_NETWORK:-proxy}"
+if ! docker network inspect "$PROXY_NETWORK" >/dev/null 2>&1; then
+  echo "Docker network $PROXY_NETWORK missing (docker network ls; set PROXY_NETWORK in $ENV_FILE)"; exit 1
+fi
+
+# One-time switch from the old project name "deploy" (folder name) to "edeltraud": remove the
+# old containers first, otherwise they keep port 8787. Matches only this checkout's folder.
+old_ids="$(docker ps -aq --filter label=com.docker.compose.project=deploy \
+  --filter "label=com.docker.compose.project.working_dir=$PWD/deploy")"
+if [ -n "$old_ids" ]; then
+  echo "removing old containers of project \"deploy\": $(docker ps -a --format '{{.Names}}' --filter label=com.docker.compose.project=deploy --filter "label=com.docker.compose.project.working_dir=$PWD/deploy" | tr '\n' ' ')"
+  docker rm -f $old_ids >/dev/null
+  docker network rm deploy_default deploy_egress >/dev/null 2>&1 || true
+fi
+
 "${COMPOSE[@]}" up -d api
 
-# If Caddy (or another proxy) runs in its own Docker container, 127.0.0.1 there is the proxy
-# itself. PROXY_NETWORK in api.env names the proxy's Docker network; the API joins it under
-# the name "edeltraud-api", so the Caddyfile says: reverse_proxy edeltraud-api:8787
-PROXY_NETWORK="$( (grep -E '^PROXY_NETWORK=' "$ENV_FILE" || true) | tail -1 | cut -d= -f2- | tr -d '"'"'"' ')"
-if [ -n "$PROXY_NETWORK" ]; then
-  api_id="$("${COMPOSE[@]}" ps -q api)"
-  if ! docker network inspect "$PROXY_NETWORK" >/dev/null 2>&1; then
-    echo "PROXY_NETWORK=$PROXY_NETWORK does not exist (docker network ls)"; exit 1
-  fi
-  if ! docker inspect -f '{{json .NetworkSettings.Networks}}' "$api_id" | grep -q "\"$PROXY_NETWORK\""; then
-    docker network connect --alias edeltraud-api "$PROXY_NETWORK" "$api_id"
-    echo "api joined network $PROXY_NETWORK as edeltraud-api"
-  fi
-fi
 if grep -Eq '^PADDLE_API_KEY=.+' "$ENV_FILE" && grep -Eq '^PADDLE_WEBHOOK_SECRET=.+' "$ENV_FILE"; then
   "${COMPOSE[@]}" --profile jobs up -d jobs
 fi

@@ -2,7 +2,7 @@ import type { Artifact, CheckModule } from '../../core/types.ts';
 import { extractChunkRefs, extractScripts, sameSite, type BundleData, type PageData } from '../util.ts';
 
 /**
- * Loads the JavaScript the start page ships: external scripts of the same site, inline
+ * Loads the JavaScript the start page (and pages from collect.crawl) ships: external scripts of the same site, inline
  * scripts, and (optionally) lazily loaded chunks referenced from those bundles.
  * Third-party scripts (CDNs, analytics) are not loaded: their keys are not the app's.
  */
@@ -14,6 +14,7 @@ export const collectBundles: CheckModule<{ maxBundles: number; followLazyChunks:
     mode: 'passive',
     category: 'security',
     requires: ['artifact:page'],
+    uses: ['artifact:subpage'],
     provides: ['artifact:js-bundle'],
     params: {
       maxBundles: { type: 'number', default: 5, min: 1, max: 200 },
@@ -25,14 +26,26 @@ export const collectBundles: CheckModule<{ maxBundles: number; followLazyChunks:
   async run(ctx, params) {
     const page = ctx.artifacts.list('page')[0]!.data as PageData;
     const host = new URL(page.finalUrl).hostname;
-    const { external, inline } = extractScripts(page.html, page.finalUrl);
-    const artifacts: Artifact[] = inline.map((code, i) => ({
-      type: 'js-bundle',
-      key: `${page.finalUrl}#inline-${i + 1}`,
-      data: { url: `${page.finalUrl}#inline-${i + 1}`, source: 'inline', status: 200, headers: {}, code, truncated: false } satisfies BundleData,
-    }));
+    const artifacts: Artifact[] = [];
+    const external: string[] = [];
+    const inlineSeen = new Set<string>();
+    // Start page first, then crawled pages: their scripts are only new ones (the same inline config counts once).
+    for (const p of [page, ...ctx.artifacts.list('subpage').map((a) => a.data as PageData)]) {
+      const s = extractScripts(p.html, p.finalUrl);
+      external.push(...s.external);
+      s.inline.forEach((code, i) => {
+        if (inlineSeen.has(code)) return;
+        inlineSeen.add(code);
+        const key = `${p.finalUrl}#inline-${i + 1}`;
+        artifacts.push({
+          type: 'js-bundle',
+          key,
+          data: { url: key, source: 'inline', status: 200, headers: {}, code, truncated: false } satisfies BundleData,
+        });
+      });
+    }
 
-    const queue = external.filter((u) => sameSite(new URL(u).hostname, host));
+    const queue = [...new Set(external.filter((u) => sameSite(new URL(u).hostname, host)))];
     const seen = new Set(queue);
     let loaded = 0;
     const notChecked = [];

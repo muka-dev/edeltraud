@@ -146,17 +146,17 @@ export const robotsHints: CheckModule = {
 // ---------------------------------------------------------------- generator tag
 
 /**
- * Tiny version table. Stand: 21.11.2026, zu prüfen (not an advisory database; see deps-db.ts for that).
- * - Astro: minimum 7.4.7. Source: advisory as given in the task brief (Nov 2026), CVE-2026-126364,
- *   path check bypass in combination with @astrojs/node. Not verified against the upstream advisory here;
- *   the dependency (@astrojs/node) cannot be seen from the generator tag, hence confidence 'possible'.
+ * Tiny version table. Stand: 27.11.2026 (not an advisory database; see deps-db.ts for that).
+ * - Astro: minimum 7.4.7 (GHSA-r3h5-4585-7x3w, CVE-2026-126364, medium, affects >=5.14.3 with
+ *   @astrojs/node; checked 27.11.2026). Also covers the critical AVIF RCE GHSA-26w7-cxv4-gfx2 (< 7.2.8).
+ *   The dependency (@astrojs/node) cannot be seen from the generator tag, hence confidence 'possible'.
  * - WordPress: deliberately NO rule. Which branches still get security fixes is not certain
  *   enough to flag a version here. Add only after checking https://wordpress.org/about/security/.
  */
 export const GENERATOR_MIN: Record<string, { min: string; advisory: string }> = {
-  astro: { min: '7.4.7', advisory: 'CVE-2026-126364' },
+  astro: { min: '7.4.7', advisory: 'CVE-2026-126364, GHSA-26w7-cxv4-gfx2' },
 };
-export const GENERATOR_TABLE_DATE = '21.11.2026';
+export const GENERATOR_TABLE_DATE = '27.11.2026';
 
 const GENERATORS: { name: string; re: RegExp }[] = [
   { name: 'Astro', re: /^Astro\b\s*v?(\d+(?:\.\d+){0,2})?/i },

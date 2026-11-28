@@ -1,16 +1,18 @@
-# Watch: weekly passive run, mail only on new findings (diff by fingerprint).
+# Watch: weekly passive run, active modules monthly with valid proof of ownership
+# (see src/watch/runner.ts); mail only on new findings (diff by fingerprint).
 plan: watch
 version: 1
 limits: { totalMs: 120000, requests: 400, browser: true }
 modules:
   - collect.page
   - collect.bundles: { maxBundles: 80, followLazyChunks: true }
-  - collect.sourcemaps: { headOnly: true, maxMaps: 20 }
+  - collect.sourcemaps: { headOnly: false, maxMaps: 20 }
   - collect.tls
-  - collect.render: { waitMs: 4000, maxRequests: 300 }
+  - collect.render: { waitMs: 4000, maxRequests: 300, audit: true }
   - collect.dns
   - collect.legal
   - collect.wellknown
+  - collect.crawl: { maxPages: 5 }
   - collect.errorpages
   - stack.detect
   - secrets.frontend
@@ -19,6 +21,13 @@ modules:
   - errors.verbose
   - privacy.legal-pages
   - ops.errors-console
+  - a11y.basics
+  - a11y.statement
+  - seo.basics
+  - ops.404
+  - a11y.axe
+  - perf.weight
+  - perf.vitals
   - mixed.content
   - sri.missing
   - privacy.third-party

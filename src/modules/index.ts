@@ -17,9 +17,12 @@ import { FIREBASE_MODULES } from './probe/firebase.ts';
 import { pathsSensitive } from './probe/paths.ts';
 import { dnsDangling } from './analyze/dangling.ts';
 import { collectWellknown } from './collect/wellknown.ts';
+import { collectCrawl } from './collect/crawl.ts';
 import { WELLKNOWN_ANALYZERS } from './analyze/wellknown.ts';
 import { ENDPOINT_MODULES } from './analyze/endpoints.ts';
 import { API_MODULES } from './probe/api.ts';
+import { aiEdgeFunctionOpen } from './probe/ai-edge.ts';
+import { authEnumeration, ratelimitAuth } from './probe/auth-login.ts';
 import { collectDns } from './collect/dns.ts';
 import { dnsMail } from './analyze/dns.ts';
 import { headersCspQuality } from './analyze/csp.ts';
@@ -34,6 +37,9 @@ import { secretsFrontend } from './analyze/secrets.ts';
 import { sourcemapsExposed } from './analyze/sourcemaps.ts';
 import { stackDetect } from './analyze/stack.ts';
 import { tlsBasics } from './analyze/tls.ts';
+import { a11yBasics, a11yStatement } from './analyze/a11y.ts';
+import { ops404, seoBasics } from './analyze/seo.ts';
+import { a11yAxe, perfVitals, perfWeight } from './analyze/lab.ts';
 
 /** All modules, registered at build time. New modules are added here. */
 export const MODULES: readonly CheckModule<any>[] = [
@@ -44,6 +50,7 @@ export const MODULES: readonly CheckModule<any>[] = [
   collectRender,
   collectLegal,
   collectWellknown,
+  collectCrawl,
   collectDns,
   collectErrorpages,
   stackDetect,
@@ -62,6 +69,13 @@ export const MODULES: readonly CheckModule<any>[] = [
   errorsVerbose,
   privacyLegalPages,
   opsErrorsConsole,
+  a11yBasics,
+  a11yStatement,
+  seoBasics,
+  a11yAxe,
+  perfWeight,
+  perfVitals,
+  ops404,
   mixedContent,
   sriMissing,
   privacyThirdParty,
@@ -77,6 +91,9 @@ export const MODULES: readonly CheckModule<any>[] = [
   ...WELLKNOWN_ANALYZERS,
   ...ENDPOINT_MODULES,
   ...API_MODULES,
+  aiEdgeFunctionOpen,
+  authEnumeration,
+  ratelimitAuth,
 ];
 
 export function createRegistry(modules: readonly CheckModule<any>[] = MODULES): Map<string, CheckModule> {

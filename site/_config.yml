@@ -1,0 +1,19 @@
+title: EDEL.TRAUD.AI
+description: Open core of a scanner for typical flaws in AI-built web apps
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+plugins: [jekyll-remote-theme, jekyll-seo-tag]
+url: https://muka-dev.github.io
+baseurl: /edeltraud
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+aux_links:
+  GitHub: https://github.com/muka-dev/edeltraud
+  Hosted service: https://scan.m-ko.de
+aux_links_new_tab: true
+gh_edit_link: true
+gh_edit_repository: https://github.com/muka-dev/edeltraud
+gh_edit_branch: main
+gh_edit_source: site
+gh_edit_view_mode: edit
+footer_content: 'AGPL-3.0-only. A result without findings only means these checks found nothing; it is no certificate and no guarantee.'

@@ -47,6 +47,12 @@ Inhaberschaft (`src/ownership/`), `supabase.auth-settings` (passiv),
 Nachweis). Bei allen aktiven Proben gilt: nur GET/HEAD, höchstens ein
 Datensatz, im Ergebnis nur Namen und Anzahlen, nie Werte.
 
+**Umgesetzt am 28.11.2026:** `a11y.basics`, `a11y.statement`, `seo.basics`,
+`ops.404` (passiv, ohne eigene Anfragen; Bericht, Tiefenprüfung, WatchDog).
+Ebenfalls 28.11.: `a11y.axe`, `perf.weight`, `perf.vitals` aus `collect.render` mit `audit: true`.
+Barrierefreiheit nur als Hinweis mit BFSG-Bezug, keine Aussage über die
+Erfüllung gesetzlicher Anforderungen.
+
 Alle Befunde sind Auffälligkeiten, keine Aussage über die Sicherheit oder
 Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 **Hinweise**, keine rechtliche Bewertung.
@@ -59,7 +65,7 @@ Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 | `collect.bundles` | Eingebundene JS/CSS, Ampel max. 5, sonst inkl. Lazy-Chunks | C | ✓ | ✓ | ✓ | ✓ | 1 |
 | `collect.tls` | Zertifikat, Protokolle, Weiterleitung http→https | C | ✓ | ✓ | ✓ | ✓ | 1 |
 | `collect.render` | Seite im Headless-Browser, alle Netzwerkanfragen, Cookies, DOM, Konsole | C | – | ✓ | ✓ | ✓ | 2 |
-| `collect.crawl` | Bis zu N interne Seiten (Sitemap, Links, Routen aus dem Bundle) | C | – | ✓ | ✓ | ✓ | 2 |
+| `collect.crawl` | Bis zu N interne Seiten derselben Origin (Sitemap, Links der Startseite; robots.txt beachtet, keine Logout/Löschen/Kasse-Pfade) | C | – | ✓ | ✓ | ✓ | 2 |
 | `collect.dns` | A/AAAA, CNAME, MX, SPF, DMARC, CAA; erkennt Plattform-Domains (vercel.app, lovable.app …) | C | – | ✓ | ✓ | ✓ | 2 |
 | `collect.errorpages` | Zwei feste, nicht vorhandene Pfade (`/edeltraud-check-404`, `/api/edeltraud-check-404`) per GET | C | – | ✓ | ✓ | ✓ | 2 |
 | `collect.wellknown` | robots.txt, sitemap.xml, security.txt, manifest | C | – | ✓ | ✓ | ✓ | 2 |
@@ -125,8 +131,8 @@ Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 | `paths.sensitive` | `/.env`, `/.git/config`, Backups, `/admin`, Debug-Routen | kritisch–mittel | – | – | ✓ | ✓ | 3 |
 | `api.unauth` | Gefundene API-Endpunkte ohne Anmeldung (nur GET) | hoch | – | – | ✓ | ✓ | 3 |
 | `cors.policy` | `Access-Control-Allow-Origin` gespiegelt oder `*` mit Credentials | hoch | – | – | ✓ | ✓ | 3 |
-| `ratelimit.auth` | Anmeldung und Passwort-Reset: Begrenzung vorhanden (≤ 10 Anfragen) | mittel | – | – | ✓ | – | 4 |
-| `auth.enumeration` | Unterschiedliche Antworten für bekannte und unbekannte Konten | niedrig | – | – | ✓ | – | 4 |
+| `ratelimit.auth` | Passwort-Login: Begrenzung vorhanden (≤ 10 Fehlversuche, erfundene Adresse, kein Reset) | mittel | – | – | ✓ | – | 4 |
+| `auth.enumeration` | Unterschiedliche Antworten für bekannte und unbekannte Konten (Firebase: EMAIL_NOT_FOUND) | mittel | – | – | ✓ | – | 4 |
 
 ## Hinter der Anmeldung (mit zwei Testkonten, Tiefenprüfung Plus)
 
@@ -153,19 +159,19 @@ Rechtskonformität der App. Datenschutz- und Barrierefreiheits-Module geben
 
 | ID | Inhalt | B | T | W | Welle |
 |---|---|---|---|---|---|
-| `a11y.axe` | Automatische Prüfung mit axe-core im gerenderten DOM | ✓ | ✓ | ✓ | 3 |
-| `a11y.basics` | `lang`, Alternativtexte, Formular-Labels, Kontrast, Fokus sichtbar | ✓ | ✓ | ✓ | 3 |
-| `a11y.statement` | Erklärung zur Barrierefreiheit vorhanden | ✓ | ✓ | ✓ | 3 |
+| `a11y.axe` | axe-core 4.14 (WCAG 2.x A/AA) im gerenderten DOM der Startseite; nur Regel, Wirkung, Anzahl und Selektoren, kein Elementinhalt; Regeln von `a11y.basics` ausgelassen | ✓ | ✓ | ✓ | 3 |
+| `a11y.basics` | `lang`, Alternativtexte, Formular-Labels, Namen von Schaltflächen/Links, Zoom-Sperre (`user-scalable=no`, `maximum-scale` < 2), `<title>`; aus dem HTML, Startseite + Unterseiten. Kontrast und Fokus erst mit `a11y.axe` | ✓ | ✓ | ✓ | 3 |
+| `a11y.statement` | Link auf eine Erklärung zur Barrierefreiheit (Text oder Pfad, DE/EN/PT) | ✓ | ✓ | ✓ | 3 |
 
 ## Betrieb und Qualität
 
 | ID | Inhalt | B | T | W | Welle |
 |---|---|---|---|---|---|
-| `perf.weight` | Seitengewicht, Bundle-Größe, Anzahl Anfragen, Bilder ohne Komprimierung | ✓ | ✓ | ✓ | 3 |
-| `perf.vitals` | LCP, CLS, TBT im Labor (Browser) | ✓ | ✓ | ✓ | 3 |
+| `perf.weight` | Übertragene Bytes eines Ladevorgangs: gesamt (> 2,5 / 5 MB), JavaScript (> 1 MB), Bilder (> 500 KB) | ✓ | ✓ | ✓ | 3 |
+| `perf.vitals` | LCP, CLS, TBT eines Desktop-Ladevorgangs, Schwellen der Core Web Vitals, Konfidenz „possible“ | ✓ | ✓ | ✓ | 3 |
 | `ops.errors-console` | Fehler in der Browser-Konsole beim Laden | ✓ | ✓ | ✓ | 2 |
-| `ops.404` | Saubere 404-Seite, keine Soft-404 für API-Routen | ✓ | ✓ | ✓ | 3 |
-| `seo.basics` | Titel, Beschreibung, OG-Tags, Sitemap, `noindex` auf Produktion | ✓ | ✓ | ✓ | 3 |
+| `ops.404` | Saubere 404: erfundene Pfade (Seite und `/api/`) antworten nicht mit 200 und HTML (Soft 404) | ✓ | ✓ | ✓ | 3 |
+| `seo.basics` | Titel (fehlt, > 65 Zeichen), Beschreibung, canonical, `noindex` (Meta oder X-Robots-Tag), h1 (keine/mehrere), `og:title`/`og:image` | ✓ | ✓ | ✓ | 3 |
 
 ## Umfang je Stufe (Ziel nach Welle 3)
 

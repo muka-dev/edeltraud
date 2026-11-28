@@ -1,0 +1,18 @@
+name: False positive / missed finding
+description: A check reported something wrong, or missed something it should find.
+labels: [check-quality]
+body:
+  - type: input
+    id: module
+    attributes: { label: Module ID, placeholder: "secrets.frontend" }
+    validations: { required: true }
+  - type: dropdown
+    id: kind
+    attributes: { label: Kind, options: [False positive, Missed finding, Wrong severity] }
+    validations: { required: true }
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: A minimal, anonymised snippet (HTML, header, bundle excerpt). Never post real secrets or third-party URLs without permission.
+    validations: { required: true }

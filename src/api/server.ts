@@ -57,6 +57,8 @@ export interface ApiOptions {
   webDir?: string | null;
   /** Trust X-Forwarded-For (only behind your own reverse proxy). */
   trustProxy?: boolean;
+  /** Extra health check for /health (e.g. job worker); not ok answers 503. No personal data. */
+  health?: () => Promise<{ ok: boolean } & Record<string, unknown>>;
 }
 
 /**
@@ -102,7 +104,11 @@ export function createApi(opts: ApiOptions = {}) {
     res.setHeader('cache-control', 'no-store');
     try {
       if (req.method === 'OPTIONS') return send(res, 204);
-      if (req.method === 'GET' && req.url === '/health') return send(res, 200, { ok: true });
+      if (req.method === 'GET' && req.url === '/health') {
+        if (!opts.health) return send(res, 200, { ok: true });
+        const h = await opts.health().catch(() => ({ ok: false, error: 'health_check_failed' }));
+        return send(res, h.ok ? 200 : 503, h);
+      }
       if (req.method === 'GET' && req.url === '/v1/challenge') {
         return pow ? send(res, 200, pow.issue()) : send(res, 404, { error: 'pow_disabled' });
       }
@@ -366,8 +372,25 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
       console.warn(`payment disabled: ${e instanceof Error ? e.message : e} (see deploy/README.md, section 6)`);
     }
   }
+  // With a job queue, /health also reports a stuck worker (a due job waiting longer than 2 h).
+  let health: ApiOptions['health'];
+  if (process.env.JOBS_DIR) {
+    try {
+      const mod: string = '../jobs/queue.ts';
+      const { JobQueue } = await import(mod);
+      const queue = new JobQueue(process.env.JOBS_DIR);
+      const maxAgeMs = Number(process.env.HEALTH_MAX_QUEUE_AGE_MS ?? 2 * 60 * 60_000);
+      health = async () => {
+        const stalled: number = await queue.stalled(new Date(), maxAgeMs);
+        return stalled ? { ok: false, jobs: 'stalled', stalled } : { ok: true };
+      };
+    } catch (e) {
+      console.warn(`job health check disabled: ${e instanceof Error ? e.message : e}`);
+    }
+  }
   createApi({
     ...(origins ? { origins } : {}),
+    ...(health ? { health } : {}),
     ...(watch ? { watch } : {}),
     ...(commerce ? { commerce } : {}),
     ...(process.env.PADDLE_CLIENT_TOKEN

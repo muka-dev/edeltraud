@@ -6,7 +6,9 @@ import { FAKE } from './fixtures/sites.ts';
 
 // The report plan adds an info note for a missing security.txt to every fixture app; it has its own test below.
 const SECURITYTXT = 'wellknown.securitytxt/securitytxt-missing';
-const ids = (r: { findings: { id: string }[] }) => r.findings.map((f) => f.id).filter((id) => id !== SECURITYTXT).sort();
+// a11y, SEO and 404 hints have their own tests (a11y-seo.test.ts).
+const QUALITY = /^(a11y|seo)\.|^ops\.404\//;
+const ids = (r: { findings: { id: string }[] }) => r.findings.map((f) => f.id).filter((id) => id !== SECURITYTXT && !QUALITY.test(id)).sort();
 const RAW = [FAKE.openai, FAKE.anthropic, FAKE.stripeLive, FAKE.github, FAKE.serviceRole, FAKE.googleGemini, FAKE.googleFirebase];
 const stack = (r: { facts: Record<string, unknown> }) => r.facts['stack'] as string[];
 

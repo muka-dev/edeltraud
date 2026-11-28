@@ -15,5 +15,6 @@ RUN npm ci --omit=dev \
  && rm -rf /root/.npm /var/lib/apt/lists/*
 COPY src ./src
 COPY plans ./plans
+COPY vendor ./vendor
 USER node
 ENTRYPOINT ["node", "src/cli/main.ts"]

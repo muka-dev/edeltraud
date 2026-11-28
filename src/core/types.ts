@@ -108,8 +108,11 @@ export interface Logger {
 
 export interface HttpRequest {
   url: string;
-  method?: 'GET' | 'HEAD';
+  /** POST only for ai.edge-function-open (one invalid-JSON body) and the failed fake logins of
+   *  ratelimit.auth / auth.enumeration (documented exceptions). */
+  method?: 'GET' | 'HEAD' | 'POST';
   headers?: Record<string, string>;
+  body?: string;
   /** Max bytes of body to read. */
   maxBytes?: number;
   /** Follow redirects (default true, max 5). */
@@ -210,10 +213,34 @@ export interface RenderData {
   blocked: string[];
   /** The request limit cut the page load short. */
   limitReached: boolean;
+  /** Only with render option audit: axe-core and lab performance of this one load. */
+  audit?: RenderAudit;
+}
+
+/** One axe-core rule that failed. Targets are CSS selectors only, never element contents. */
+export interface AxeViolation {
+  id: string;
+  impact: 'minor' | 'moderate' | 'serious' | 'critical' | null;
+  nodes: number;
+  targets: string[];
+}
+
+export interface RenderAudit {
+  axe?: { version: string; violations: AxeViolation[] } | { error: string };
+  /** Lab values of one desktop load; null where the browser gave no value. */
+  perf?: {
+    lcpMs: number | null;
+    cls: number | null;
+    tbtMs: number | null;
+    /** Transferred bytes by resource type (document, script, stylesheet, image, font, other). */
+    bytes: Record<string, number>;
+    /** Largest images by transferred bytes, URL without query. */
+    largestImages: { url: string; bytes: number }[];
+  };
 }
 
 export interface Browser {
-  render(url: string, opts: { waitMs: number; maxRequests: number; timeoutMs: number }): Promise<RenderData>;
+  render(url: string, opts: { waitMs: number; maxRequests: number; timeoutMs: number; audit?: boolean }): Promise<RenderData>;
 }
 
 export interface ArtifactReader {

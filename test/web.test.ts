@@ -21,10 +21,11 @@ test('index.html has no inline script content and no on* attributes', () => {
   assert.doesNotMatch(html, /javascript:/i);
 });
 
-test('no external src/href except links to m-ko.de', () => {
+test('no external src/href except links to m-ko.de and the open core on GitHub', () => {
   for (const m of html.matchAll(/<(\w+)\b[^>]*?\b(src|href)="(https?:\/\/[^"]+)"[^>]*>/gi)) {
     const [, tag = '', , url = ''] = m;
     assert.equal(tag.toLowerCase(), 'a', `external ${url} only allowed on <a>`);
+    if (url === 'https://github.com/muka-dev/edeltraud') continue;
     assert.match(new URL(url).hostname, /^(www\.)?m-ko\.de$/, url);
   }
   assert.doesNotMatch(html, /(src|href)=["']\/\//i);

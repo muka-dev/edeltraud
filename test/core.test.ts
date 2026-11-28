@@ -76,7 +76,7 @@ test('module ids are unique and manifests well-formed', () => {
   const ids = MODULES.map((x) => x.manifest.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const x of MODULES) {
-    assert.match(x.manifest.id, /^[a-z]+(\.[a-z0-9-]+)+$/);
+    assert.match(x.manifest.id, /^[a-z][a-z0-9]*(\.[a-z0-9-]+)+$/);
     assert.match(x.manifest.version, /^\d+\.\d+\.\d+$/);
     if (x.manifest.kind === 'analyzer') assert.equal(x.manifest.mode, 'passive', `${x.manifest.id}: analyzers are passive`);
   }

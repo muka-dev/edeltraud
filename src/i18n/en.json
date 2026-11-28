@@ -115,7 +115,16 @@
     "jobs.ownership.valid": "The proof can be set up until {date} (14 days).",
     "jobs.failure.subject": "About the check of {host}",
     "jobs.failure.title": "The check of {host} could not be completed automatically",
-    "jobs.failure.body": "This happens occasionally. Markus Kosmal will look at it personally, usually within one working day. No further action is needed."
+    "jobs.failure.body": "This happens occasionally. Markus Kosmal will look at it personally, usually within one working day. No further action is needed.",
+    "report.fix.title": "Get it fixed: fix package",
+    "report.fix.text": "Up to 5 critical or high findings from this report are fixed in up to 4 hours, as a pull request in the repository, followed by a re-check. €390 net, 2 slots per month.",
+    "report.fix.cta": "Request the fix package",
+    "jobs.watchOwnership.subject": "WatchDog for {host}: proof for the monthly deep check",
+    "jobs.watchOwnership.title": "WatchDog for {host} is running – optionally with a monthly deep check",
+    "jobs.watchOwnership.why": "From now on the WatchDog checks every week passively, i.e. the way a visitor sees the app. Once a month it can also check actively (e.g. database rules and login rate limits). That is only allowed for apps owned by the customer; a DNS record is enough as proof.",
+    "jobs.watchOwnership.dns": "DNS TXT record",
+    "jobs.watchOwnership.linkLabel": "Verify proof",
+    "jobs.watchOwnership.keep": "Keep the record while the WatchDog runs: it is rechecked silently before every monthly deep check. Without it, the weekly passive check continues."
   },
   "findings": {
     "secrets.server-key": {
@@ -378,6 +387,11 @@
       "explain": "The response headers disclose PHP {version}. This version number falls in the range of {advisories} (PHP2Shell, unauthenticated remote code execution, CVSS 9.2). Fixed in PHP 8.5.12, 8.4.27, 8.3.36 and 8.2.35; there is no official fix for 8.1 and older. Linux distributions often backport fixes and keep the old version number (for example Ubuntu 24.04 ships 8.3.6 with the fix). The version number therefore only suggests the vulnerability; the hoster or distribution may have patched it already.",
       "fix": "1. Run php -v and read the security notice of the distribution or hosting provider to check whether the fix is included. 2. If not, update to PHP {fixed} or newer, or ask the hoster to. 3. Hide the version in the response headers."
     },
+    "server.php-update": {
+      "title": "PHP {version}: security update of 19 Nov 2026 missing (possibly already patched)",
+      "explain": "The response headers name PHP {version}. On 19 Nov 2026, 18 issues in PHP were fixed, including {advisories} (among them request smuggling in PHP-FPM and code execution). The severe issues need an uncommon configuration. Distributions often backport fixes and keep the old version number, so the version only suggests the update is missing.",
+      "fix": "1. Check with php -v and the security notice of the distribution or hosting provider whether the update is included. 2. Otherwise update PHP to {fixed} or newer, or ask the hosting provider to do so. 3. Hide the version in the response headers."
+    },
     "server.php-eol": {
       "title": "PHP {version} is no longer maintained",
       "explain": "The response headers disclose PHP {version}. This branch no longer receives security updates, so newly found vulnerabilities are not fixed. Some distributions maintain branches longer, which cannot be seen from outside.",
@@ -543,6 +557,26 @@
       "explain": "An anonymous GET request (no cookies, no credentials) to {path} returned JSON data: {count} entries, fields {fields}. Only the count and field names were stored, no values. If the data is not meant to be public, anyone with the address can read it.",
       "fix": "1. Decide whether the endpoint is meant to be public. 2. If not: check authentication on the server and limit access to the caller's own records. 3. Return only the fields that are needed. 4. Call it again without login and confirm it answers 401 or 403."
     },
+    "ai.edge-function-open": {
+      "title": "AI function {name} runs without login",
+      "explain": "The Supabase Edge Function {name} looks like it calls a language model. A single request with only the app's public key (no login) and a deliberately invalid body was not rejected: the function ran until it read the input. No real prompt was sent, only the status code was stored. Anyone can probably call the function as often as they like and use up the app's LLM budget (cost abuse).",
+      "fix": "1. Verify the JWT in the function and use auth.getUser() to make sure a signed-in user is calling; otherwise return 401. The public anon key alone is not a login. 2. Limit requests per user (rate limit). 3. Set a spending cap at the LLM provider. 4. Call it again without login and confirm it answers 401."
+    },
+    "ratelimit.auth.supabase": {
+      "title": "Login does not limit failed attempts (Supabase)",
+      "explain": "The Supabase email/password login received {attempts} failed login attempts with the same made-up address (ending example.invalid, no real account) and short pauses. None was throttled with HTTP 429. Only status codes and counts were stored. Passwords can probably be guessed in large numbers. Supabase partly limits per IP over a longer window; these limits are configurable per project in the dashboard and not fully visible from outside.",
+      "fix": "1. In the Supabase dashboard under Authentication → Rate Limits, lower the limit for sign-ins. 2. Enable CAPTCHA protection (hCaptcha or Cloudflare Turnstile) for sign-in and add it to the form. 3. Check again that repeated failed attempts are answered with 429."
+    },
+    "ratelimit.auth.firebase": {
+      "title": "Login does not limit failed attempts (Firebase)",
+      "explain": "The Firebase login (signInWithPassword) received {attempts} failed login attempts with the same made-up address (ending example.invalid, no real account) and short pauses. None was throttled (no HTTP 429, no TOO_MANY_ATTEMPTS_TRY_LATER). Only status codes and counts were stored. Passwords can probably be guessed in large numbers. Firebase partly limits per IP over a longer window, which is not fully visible from outside.",
+      "fix": "1. Enable and enforce Firebase App Check with reCAPTCHA Enterprise for Authentication. 2. Turn on email enumeration protection under Authentication → Settings. 3. If needed, set up reCAPTCHA Enterprise for password sign-in. 4. Check again that repeated failed attempts are throttled."
+    },
+    "auth.enumeration": {
+      "title": "Login reveals whether an account exists (Firebase)",
+      "explain": "A single login attempt with a made-up address (ending example.invalid) was answered by Firebase with EMAIL_NOT_FOUND instead of the uniform INVALID_LOGIN_CREDENTIALS. Email enumeration protection is therefore off: anyone can check which email addresses have an account in the app and target them with password guessing or phishing. Only the error code was stored.",
+      "fix": "1. In the Firebase console under Authentication → Settings → User actions, enable email enumeration protection. 2. Use one uniform error message in the app (\"wrong email or password\"). 3. Enable App Check with reCAPTCHA Enterprise. 4. Check again that an unknown address returns INVALID_LOGIN_CREDENTIALS."
+    },
     "auth.client-only": {
       "title": "Access control for admin areas seems to live only in the browser",
       "explain": "The front-end code contains admin routes ({routes}) together with role checks such as role === \"admin\", but no endpoints under /api/admin and no Edge Functions with \"admin\" in the name. This is a hint, not proof. Hiding UI does not protect data: anyone calling the endpoints directly bypasses every check in the browser. Rights must be enforced on the server or in the database (Row Level Security).",
@@ -562,6 +596,126 @@
       "title": "CORS reflects any origin ({path})",
       "explain": "The response from {path} echoed the origin of a foreign, made-up domain in Access-Control-Allow-Origin without allowing credentials. For public data this is often intended; for non-public data the list of allowed origins should be limited.",
       "fix": "1. Check whether the endpoint should be readable from any website. 2. If not: use a fixed list of own origins. 3. Test again with a foreign origin."
+    },
+    "a11y.no-lang": {
+      "title": "Page language not declared",
+      "explain": "On {pages} page(s) the lang attribute on the <html> element is missing or empty. Screen readers use it to choose pronunciation; without it, text is often read out wrongly. Germany's Accessibility Strengthening Act (BFSG, in force since 28 June 2025) applies to many consumer services. Only a small part can be checked automatically; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. Set the language on the <html> element, e.g. <html lang=\"en\">. 2. In multilingual apps set the value per language. 3. Mark passages in another language with their own lang."
+    },
+    "a11y.img-alt": {
+      "title": "{count} images without alternative text",
+      "explain": "{count} images on {pages} page(s) have no alt attribute, e.g. {sample}. Screen readers then read out the file name or nothing. Germany's Accessibility Strengthening Act (BFSG, in force since 28 June 2025) applies to many consumer services. Only a small part can be checked automatically; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. For meaningful images write a short alt text that says what the image shows or does. 2. Mark purely decorative images with alt=\"\". 3. Always pass alt to image components (e.g. Image in Next.js)."
+    },
+    "a11y.input-label": {
+      "title": "{count} form fields without a label",
+      "explain": "{count} form fields on {pages} page(s) have no associated label, e.g. {sample}. A placeholder is not a label: it disappears while typing and is not read out reliably. Germany's Accessibility Strengthening Act (BFSG, in force since 28 June 2025) applies to many consumer services. Only a small part can be checked automatically; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. Give every field a <label for=\"id\"> or wrap it in <label>. 2. Where no visible label fits, set aria-label. 3. Check with keyboard and screen reader that every field is announced."
+    },
+    "a11y.control-name": {
+      "title": "{count} buttons or links without an accessible name",
+      "explain": "{count} buttons or links on {pages} page(s) have no text, aria-label or title, e.g. {sample}. These are often icon buttons (menu, close, social icons). Screen readers then only announce \"button\" or the address. Germany's Accessibility Strengthening Act (BFSG, in force since 28 June 2025) applies to many consumer services. Only a small part can be checked automatically; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. Give icon buttons an aria-label, e.g. aria-label=\"Open menu\". 2. Set alt text on images inside links. 3. Hide purely decorative icons with aria-hidden=\"true\"."
+    },
+    "a11y.zoom-blocked": {
+      "title": "Zoom blocked on mobile devices",
+      "explain": "The viewport meta tag prevents zooming ({sample}). People with low vision then cannot enlarge the page on their phone. Germany's Accessibility Strengthening Act (BFSG, in force since 28 June 2025) applies to many consumer services. Only a small part can be checked automatically; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. Remove user-scalable=no and maximum-scale. 2. Recommended: <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">. 3. Check on a phone that pinch-to-zoom works."
+    },
+    "a11y.no-title": {
+      "title": "Page without a title",
+      "explain": "On {pages} page(s) the <title> is missing or empty. The title is the first thing screen readers announce and appears in the browser tab. Germany's Accessibility Strengthening Act (BFSG, in force since 28 June 2025) applies to many consumer services. Only a small part can be checked automatically; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. Give every page a unique <title>, e.g. \"Pricing – App name\". 2. In single-page apps set the title per route."
+    },
+    "a11y.no-statement": {
+      "title": "No accessibility statement linked",
+      "explain": "No link to an accessibility statement was found (e.g. \"Accessibility\" or /accessibility). If a service falls under Germany's BFSG (since 28 June 2025, many consumer services; based on the European Accessibility Act), information on accessibility is expected. Whether it applies depends on the service and company size; this is a hint, not a legal assessment.",
+      "fix": "1. Clarify whether the service falls under the BFSG or the European Accessibility Act. 2. If so: create a page with information on accessibility (status, known limitations, contact for feedback). 3. Link it in the footer of every page."
+    },
+    "seo.title-missing": {
+      "title": "Start page without a title",
+      "explain": "The delivered HTML of the start page has no <title> or it is empty. Search engines and link previews then show the address or text of their own choosing.",
+      "fix": "1. Set a short, unique <title> with name and benefit (up to about 60 characters). 2. In single-page apps put the title into the delivered index.html."
+    },
+    "seo.title-long": {
+      "title": "Start page title too long ({length} characters)",
+      "explain": "The <title> of the start page has {length} characters. Search engines cut it off from about {max} characters; the end is then not visible.",
+      "fix": "1. Shorten the title to at most {max} characters. 2. Put the most important part (name, benefit) first."
+    },
+    "seo.description-missing": {
+      "title": "No meta description",
+      "explain": "The start page has no <meta name=\"description\">. Search engines and link previews then pick a text snippet themselves, often a poor one.",
+      "fix": "1. Write a description of about 120–160 characters that says what the app does. 2. Add it as <meta name=\"description\" content=\"…\"> in the <head>."
+    },
+    "seo.canonical-missing": {
+      "title": "No canonical address",
+      "explain": "The start page declares no canonical address (<link rel=\"canonical\">). If the page is reachable under several addresses (with/without www, platform domain such as *.vercel.app), search engines may show the wrong one.",
+      "fix": "1. Set <link rel=\"canonical\" href=\"https://your-domain/\"> in the <head>. 2. Redirect the platform domain to your own domain."
+    },
+    "seo.noindex": {
+      "title": "Start page hidden from search engines (noindex)",
+      "explain": "The start page is marked noindex via {source}. Search engines then do not list it. On test and preview environments that is right; in production it is usually a mistake – intended?",
+      "fix": "1. Check whether the page should be found. 2. If so: remove noindex from the robots meta tag or the X-Robots-Tag header (often a platform setting or a leftover from development). 3. Then resubmit it in Search Console."
+    },
+    "seo.h1-missing": {
+      "title": "No main heading (h1)",
+      "explain": "The start page has no <h1>. The main heading helps search engines and screen readers to recognise what the page is about.",
+      "fix": "1. Set exactly one <h1> with the core benefit. 2. Structure further headings as <h2>, <h3>."
+    },
+    "seo.h1-multiple": {
+      "title": "Several main headings ({count} × h1)",
+      "explain": "The start page has {count} <h1> headings. One main heading is usual; several make the topic of the page less clear.",
+      "fix": "1. Keep one <h1>. 2. Turn the others into <h2> or <h3> (keep the styling with CSS)."
+    },
+    "seo.og-missing": {
+      "title": "Open Graph tags missing: {list}",
+      "explain": "The start page lacks the Open Graph tags {list}. When shared on LinkedIn, WhatsApp or Slack, no preview or a random one appears.",
+      "fix": "1. Add <meta property=\"og:title\"> and <meta property=\"og:image\"> (image about 1200 × 630 pixels, absolute URL) in the <head>. 2. Check with the platforms' preview tools."
+    },
+    "ops.soft-404": {
+      "title": "Non-existent addresses answer 200 (soft 404)",
+      "explain": "Made-up addresses ({paths}) answer with status {status} and an HTML page instead of 404. Search engines index such pages as duplicate content, monitoring misses broken links, and programs expecting an API get HTML.",
+      "fix": "1. Serve a 404 page with status 404 for unknown routes (in single-page apps: fallback only for real routes, e.g. via server configuration or a platform setting). 2. Always answer unknown paths under /api/ with 404 and JSON. 3. Check with a made-up address."
+    },
+    "a11y.contrast": {
+      "title": "Insufficient colour contrast ({count} elements)",
+      "explain": "{count} elements on the start page have too little contrast between text and background (WCAG 1.4.3), e.g. {sample}. People with low vision, and everyone in sunlight, struggle to read them. Checked with axe-core in the rendered DOM. Germany's BFSG (based on the European Accessibility Act) has applied to many consumer services since 28 June 2025. Automated checks cover only part of it; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. Adjust text or background colour: at least 4.5:1, 3:1 for large text. 2. Check light-grey hints, placeholders and text on images in particular. 3. Measure again with a contrast checker or the browser dev tools."
+    },
+    "a11y.axe": {
+      "title": "Accessibility: rule {rule} violated ({count} elements)",
+      "explain": "axe-core reports {count} affected elements on the start page for rule {rule}, e.g. {sample}. Rule description and examples: {link} Germany's BFSG (based on the European Accessibility Act) has applied to many consumer services since 28 June 2025. Automated checks cover only part of it; this is a hint, not a statement about meeting legal requirements.",
+      "fix": "1. Read the rule description at {link}. 2. Fix the listed elements. 3. Check again, e.g. with the axe DevTools browser extension."
+    },
+    "perf.weight-total": {
+      "title": "Start page loads {size}",
+      "explain": "On the first visit the start page transfers {size} in total. On mobile networks this takes noticeably long and uses data. Measured in a single lab load (desktop); real visitor values may differ.",
+      "fix": "1. Shrink images and serve them as WebP/AVIF. 2. Remove unneeded scripts and fonts or load them later. 3. Check compression (gzip/brotli) and caching."
+    },
+    "perf.weight-js": {
+      "title": "{size} of JavaScript on first visit",
+      "explain": "The start page loads {size} of JavaScript (transferred, compressed). The device has to load and run all of it before the page responds; on basic phones this takes seconds. Measured in a single lab load (desktop); real visitor values may differ.",
+      "fix": "1. Find the largest packages with a bundle analyzer. 2. Load rarely used parts via dynamic import. 3. Replace large libraries with smaller ones or import only what is needed."
+    },
+    "perf.weight-image": {
+      "title": "{count} very large images",
+      "explain": "{count} images on the start page are larger than 500 KB, e.g. {sample}.",
+      "fix": "1. Resize images to their displayed size. 2. Serve them as WebP or AVIF. 3. Use srcset and loading=\"lazy\" for images below the fold."
+    },
+    "perf.lcp": {
+      "title": "Main content appears late (LCP {value})",
+      "explain": "The largest visible element appeared after {value} (good: up to {limit}). Until then visitors see an empty or unfinished page. Measured in a single lab load (desktop); real visitor values may differ.",
+      "fix": "1. Load the main image or heading early (preload, no lazy loading for the first image). 2. Reduce render-blocking scripts and fonts. 3. In single-page apps, pre-render content on the server or statically."
+    },
+    "perf.cls": {
+      "title": "Layout shifts while loading (CLS {value})",
+      "explain": "Content moves visibly while loading (CLS {value}, good: up to {limit}). This leads to misclicks. Measured in a single lab load (desktop); real visitor values may differ.",
+      "fix": "1. Give images and embeds a fixed width and height (or aspect-ratio). 2. Reserve space for banners and late content. 3. Load fonts with font-display and a matching fallback font."
+    },
+    "perf.tbt": {
+      "title": "Page responds with delay (TBT {value})",
+      "explain": "Long script tasks block the browser for {value} in total (good: up to {limit}). Clicks and input respond late during that time. Measured in a single lab load (desktop); real visitor values may differ.",
+      "fix": "1. Split large scripts and load them later. 2. Avoid heavy work at start-up or move it to a web worker. 3. Review and reduce third-party scripts."
     }
   }
 }

@@ -56,6 +56,7 @@ test('rejects internal targets, bad input and foreign origins', async () => {
 
 import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { ProofOfWork, solve, leadingZeroBits } from '../src/api/pow.ts';
 import { clientKey } from '../src/api/ratelimit.ts';
@@ -69,7 +70,10 @@ test('proof of work: required, single use, tamper-proof', async () => {
   await withApi({ http: new ReplayHttp(vulnerableSite()), pow: { difficulty: 8 } }, async (base) => {
     assert.equal((await (await post(base, { url: 'vibe.example.com' })).json()).error, 'pow_required');
     const s = await solved(base);
-    assert.equal((await post(base, { url: 'vibe.example.com', pow: { ...s, nonce: s.nonce + 1e9 } })).status, 400);
+    // A random wrong nonce still meets difficulty 8 with p = 1/256; pick one that surely does not.
+    let bad = s.nonce + 1e9;
+    while (leadingZeroBits(createHash('sha256').update(`${s.salt}:${bad}`).digest()) >= 8) bad++;
+    assert.equal((await post(base, { url: 'vibe.example.com', pow: { ...s, nonce: bad } })).status, 400);
     assert.equal((await (await post(base, { url: 'vibe.example.com', pow: { ...s, expires: s.expires + 1 } })).json()).error, 'pow_invalid');
     const ok = await post(base, { url: 'vibe.example.com', pow: s });
     assert.equal(ok.status, 200);
@@ -211,5 +215,16 @@ test('static page: PNG (link preview image) is served with its type', async () =
     assert.equal(head.status, 200);
     assert.equal(head.headers.get('content-length'), '4');
     assert.equal((await fetch(`${base}/`, { method: 'HEAD' })).status, 200);
+  });
+});
+
+test('health: extra check answers 503 without personal data when not ok', async () => {
+  let ok = true;
+  await withApi({ http: new ReplayHttp({}), pow: false, health: async () => (ok ? { ok: true } : { ok: false, jobs: 'stalled', stalled: 2 }) }, async (base) => {
+    assert.equal((await fetch(`${base}/health`)).status, 200);
+    ok = false;
+    const r = await fetch(`${base}/health`);
+    assert.equal(r.status, 503);
+    assert.deepEqual(await r.json(), { ok: false, jobs: 'stalled', stalled: 2 });
   });
 });
